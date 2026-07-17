@@ -1,0 +1,34 @@
+{
+  "header": {
+    "cta": "Apply Now"
+  },
+  "footer": {
+    "description": "Nurturing leaders in sustainability by combining academic rigor with half a century of on-ground action research.",
+    "quickLinksTitle": "Quick Links",
+    "contactTitle": "Get in Touch",
+    "address": "XINRM Campus, Social Centre, Ahmednagar, Maharashtra.",
+    "email": "xinrmsocialcentre50@gmail.com",
+    "phone": "+91 84830 23859 | +91 90490 85389",
+    "newsletter": {
+      "placeholder": "Join our newsletter",
+      "button": "Join"
+    },
+    "copyright": "Xavier Institute of Natural Resource Management.",
+    "legalLinks": [
+      {
+        "name": "Privacy Policy",
+        "path": "/privacy"
+      },
+      {
+        "name": "Terms & Conditions",
+        "path": "/terms"
+      }
+    ]
+  },
+  "components": {
+    "quickLinks": {
+      "defaultTitle": "Quick Links",
+      "footerNote": "Active Research Hub"
+    }
+  }
+}

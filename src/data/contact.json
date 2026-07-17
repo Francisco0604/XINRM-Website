@@ -1,0 +1,52 @@
+{
+  "hero": {
+    "title": "Connect With Us",
+    "description": "We're here to help your journey in sustainability. Reach out for any enquiries."
+  },
+  "info": {
+    "title": "Contact Information",
+    "description": "We are here to answer any questions regarding the MA programme, research initiatives, or partnerships.",
+    "items": [
+      {
+        "title": "Address",
+        "content": "Social Centre Campus, Station Road, Ahmednagar, 414001, Maharashtra, India."
+      },
+      {
+        "title": "Email",
+        "content": "xinrmsocialcentre50@gmail.com"
+      },
+      {
+        "title": "Phone",
+        "content": "+91 84830 23859 | +91 90490 85389"
+      }
+    ]
+  },
+  "form": {
+    "title": "Send a Message",
+    "fields": {
+      "name": {
+        "label": "Full Name",
+        "placeholder": "John Doe"
+      },
+      "email": {
+        "label": "Email Address",
+        "placeholder": "john@example.com"
+      },
+      "subject": {
+        "label": "Subject",
+        "placeholder": ""
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "How can we help you?"
+      }
+    },
+    "options": [
+      "MA Admission Enquiry",
+      "Research Collaboration",
+      "General Enquiry"
+    ],
+    "consent": "I agree to the Privacy Policy.",
+    "cta": "Send Message"
+  }
+}

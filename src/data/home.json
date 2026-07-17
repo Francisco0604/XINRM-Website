@@ -1,0 +1,85 @@
+{
+  "hero": {
+    "badge": "Pioneering Sustainable Futures",
+    "title": "Nurturing Leaders",
+    "description": "Empowering communities and restoring nature through 50 years of on-ground excellence.",
+    "cta_primary": "Our Story",
+    "cta_secondary": "Explore MA Programme"
+  },
+  "marquee": [
+    "Applications now open for MA 2026-2027",
+    "Scholarships Available"
+  ],
+  "stats": [
+    {
+      "num": "300",
+      "label": "Villages Served",
+      "suffix": "+"
+    },
+    {
+      "num": "1280",
+      "label": "Farmers Trained",
+      "suffix": "+"
+    },
+    {
+      "num": "342",
+      "label": "SHGs Formed",
+      "suffix": ""
+    },
+    {
+      "num": "1.2M",
+      "label": "Liters Recharged",
+      "suffix": "L"
+    }
+  ],
+  "sdgs": {
+    "badge": "Our Impact Framework",
+    "title": "Acting on Global Goals",
+    "description": "We combine natural science with social action to address the world's most pressing environmental challenges.",
+    "items": [
+      {
+        "icon": "Globe",
+        "label": "Climate Action",
+        "color": "bg-emerald-50 text-emerald-600",
+        "desc": "Implementing strategies for carbon sequestration and climate resilience."
+      },
+      {
+        "icon": "Droplets",
+        "label": "Clean Water",
+        "color": "bg-blue-50 text-blue-600",
+        "desc": "Pioneering watershed management and water security in drought-prone areas."
+      },
+      {
+        "icon": "Leaf",
+        "label": "Life on Land",
+        "color": "bg-green-50 text-green-600",
+        "desc": "Restoring biodiversity and promoting sustainable land management."
+      },
+      {
+        "icon": "Users",
+        "label": "No Poverty",
+        "color": "bg-amber-50 text-amber-600",
+        "desc": "Empowering rural livelihoods through SHGs and collective action."
+      }
+    ]
+  },
+  "academic": {
+    "badge": "Academic Excellence",
+    "title": "MA in Natural Resource Management",
+    "quote": "Bridging the gap between classroom theory and on-ground action.",
+    "cta": "View Syllabus",
+    "video_label": "Watch our students in action",
+    "features": [
+      "Integrated curriculum (Social + Natural Sciences)",
+      "Hands-on GIS & Soil Testing Labs",
+      "Fieldwork in 300+ villages served by Social Centre"
+    ]
+  },
+  "impact": {
+    "badge": "Live Impact Tracker",
+    "title": "Half a Century of Transformation",
+    "description": "Our impact is measured in real change. From reforestation to community empowerment, we track our progress across the 300+ villages we serve.",
+    "cta": "Full Impact Report",
+    "status": "Live Updates"
+  }
+}

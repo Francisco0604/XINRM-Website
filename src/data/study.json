@@ -1,0 +1,120 @@
+{
+  "hero": {
+    "title": "Academic Programmes",
+    "description": "Prepare for a career in sustainability and development with our industry-leading curriculum."
+  },
+  "sidebar": [
+    {
+      "label": "MA Programme",
+      "href": "#ma-programme"
+    },
+    {
+      "label": "Curriculum",
+      "href": "#curriculum"
+    },
+    {
+      "label": "Facilities",
+      "href": "#facilities"
+    },
+    {
+      "label": "Student Support",
+      "href": "#support"
+    }
+  ],
+  "programme": {
+    "title": "MA in Natural Resource Management & SD",
+    "description": "A unique programme combining natural science with social science to address land degradation and community empowerment.",
+    "highlights": {
+      "title": "Programme Highlights",
+      "items": [
+        "Applied Research Legacy (50+ years)",
+        "Hands-on fieldwork in 300+ villages",
+        "Interdisciplinary approach",
+        "Career support in development sectors"
+      ]
+    }
+  },
+  "curriculum": {
+    "title": "Curriculum & Structure",
+    "headers": [
+      "Component",
+      "Details"
+    ],
+    "table": [
+      {
+        "component": "Theory Modules",
+        "details": "Soil Science, Water Management, Social Systems"
+      },
+      {
+        "component": "Practical Labs",
+        "details": "GIS Mapping, Soil & Water Testing"
+      },
+      {
+        "component": "Field Work",
+        "details": "Village stays and Participatory Action Research"
+      }
+    ]
+  },
+  "soil_science": {
+    "title": "Soil Science & NRM",
+    "description": "Natural Resource Management begins with the very foundation of life: the soil. Our curriculum explores the complex bio-chemical layers of the earth, from organic humus to bedrock.",
+    "tags": [
+      "Pedology",
+      "Hydrogeology"
+    ]
+  },
+  "facilities": {
+    "title": "Facilities & Labs",
+    "tour": {
+      "title": "Take a Virtual Lab Tour",
+      "description": "Explore our state-of-the-art facilities from anywhere."
+    },
+    "items": [
+      {
+        "title": "GIS Lab",
+        "description": "Equipped with industry-standard mapping software for spatial analysis and environmental planning."
+      },
+      {
+        "title": "Soil & Water Testing",
+        "description": "Full laboratory setup for analyzing soil health and water quality parameters essential for NRM."
+      }
+    ]
+  },
+  "support": {
+    "title": "Student Support & Beyond",
+    "placement": {
+      "title": "Placement Cell",
+      "description": "Connecting our graduates with top environmental NGOs, government agencies, and sustainability consultancies.",
+      "items": [
+        "Career Counseling",
+        "Industry Networking",
+        "Mock Interviews"
+      ]
+    },
+    "alumni": {
+      "title": "Alumni Network",
+      "description": "Join a global community of practitioners working at the intersection of natural resources and social justice.",
+      "count": "+500"
+    }
+  },
+  "scholarship": {
+    "title": "Scholarship Eligibility Tool",
+    "badge": "Financial Support",
+    "description": "We believe financial constraints should never hinder a passion for sustainability. Use our tool to find your potential scholarship match.",
+    "cta": "Check My Eligibility",
+    "criteria": [
+      {
+        "label": "Academic Merit",
+        "desc": "Based on graduation scores"
+      },
+      {
+        "label": "Social Background",
+        "desc": "Supporting marginalized groups"
+      },
+      {
+        "label": "Action Potential",
+        "desc": "Based on field experience"
+      }
+    ]
+  }
+}

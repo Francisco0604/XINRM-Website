@@ -1,0 +1,80 @@
+{
+  "hero": {
+    "title": "Heritage & Mission",
+    "description": "XINRM: A Legacy of Empowerment and Sustainable Change."
+  },
+  "sidebar": [
+    {
+      "label": "Heritage & Mission",
+      "href": "#background"
+    },
+    {
+      "label": "Leadership",
+      "href": "#leadership"
+    },
+    {
+      "label": "Milestones",
+      "href": "#milestones"
+    },
+    {
+      "label": "Legal Status",
+      "href": "#legal"
+    }
+  ],
+  "background": {
+    "title": "Heritage & Mission",
+    "quote": "XINRM is a natural extension of the Social Centre's 50-year legacy of empowering people to create change.",
+    "vision_fr_bacher": {
+      "title": "The Vision of Fr. Bacher",
+      "overlay": "Fr. Hermann Bacher",
+      "image": "/assets/people/hermann-bacher.jpeg",
+      "text": [
+        "Founded on the vision of the पुणे Jesuits, the Social Centre has spent decades working on knowledge dissemination, community participation, and strategic partnerships.",
+        "XINRM builds on this foundation to nurture future leaders in sustainability, bridging the gap between academia and grassroots action."
+      ]
+    },
+    "mission": {
+      "title": "Our Mission",
+      "text": "To address the gaps in the current educational landscape by combining Action Research with academic rigor, directly contributing to India's SDG targets and fostering sustainable rural development."
+    }
+  },
+  "leadership": {
+    "title": "Leadership",
+    "members": [
+      {
+        "name": "Anish",
+        "role": "Acting Director, XINRM",
+        "image": "/assets/people/anish.jpg"
+      },
+      {
+        "name": "Siju Varghese",
+        "role": "Director, Social Centre",
+        "image": "/assets/people/siju.jpg"
+      }
+    ]
+  },
+  "milestones": {
+    "title": "Our Journey",
+    "items": [
+      {
+        "year": "1966",
+        "title": "Founding",
+        "text": "Social Centre established by Fr. Hermann Bacher to drive rural development."
+      },
+      {
+        "year": "1990s",
+        "title": "Watershed Mastery",
+        "text": "Implementation of groundbreaking watershed management in 300+ villages."
+      },
+      {
+        "year": "2024",
+        "title": "Academic Horizon",
+        "text": "Official launch of XINRM and the MA in Natural Resource Management."
+      }
+    ]
+  },
+  "legal": {
+    "title": "Legal Status & Accreditation",
+    "text": "XINRM operates under the Social Centre Trust and is affiliated with relevant academic governing bodies for its MA program. We maintain the highest standards of transparency, compliance, and excellence in our educational and social initiatives."
+  }
+}

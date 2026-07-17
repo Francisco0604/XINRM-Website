@@ -1,0 +1,60 @@
+{
+  "hero": {
+    "title": "News & Notices",
+    "description": "Stay updated with XINRM activities, admissions, and field research."
+  },
+  "notices": {
+    "title": "Latest Notices",
+    "cta": "Read Full Details",
+    "items": [
+      {
+        "date": "02 MAY",
+        "title": "Guest Lecture: Sustainable Agriculture",
+        "desc": "Dr. Sharma will be visiting the campus on May 10th to discuss advanced soil conservation techniques and climate resilience."
+      }
+    ]
+  },
+  "media": {
+    "title": "XINRM in the Media",
+    "items": [
+      {
+        "type": "Article",
+        "title": "Times of India Feature",
+        "desc": "\"How XINRM students are transforming drought-prone villages in Ahmednagar\"",
+        "link_text": "Read Article"
+      },
+      {
+        "type": "Video",
+        "title": "News18 Interview",
+        "desc": "Director discusses the future of Natural Resource Management education and career prospects.",
+        "link_text": "Watch Video"
+      }
+    ]
+  },
+  "journal": {
+    "title": "Student Field Journal",
+    "badge": "Voices from the Ground",
+    "description": "Direct dispatches and research findings from our students working in the field.",
+    "cta": "Explore All Journal Entries",
+    "entries": [
+      {
+        "date": "MAY 12",
+        "author": "Rahul S.",
+        "title": "Watershed Resilience",
+        "img": "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&q=80"
+      },
+      {
+        "date": "MAY 08",
+        "author": "Anita P.",
+        "title": "SHG Empowerment",
+        "img": "https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&q=80"
+      },
+      {
+        "date": "APR 28",
+        "author": "Vikram M.",
+        "title": "Soil Health Tech",
+        "img": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80"
+      }
+    ]
+  }
+}

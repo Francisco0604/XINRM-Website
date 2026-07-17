@@ -1,0 +1,182 @@
+{
+  "hero": {
+    "badge": "Admissions 2026-2027",
+    "title": "Application Form",
+    "description": "Join the next generation of leaders in Natural Resource Management. Please fill out the details below carefully."
+  },
+  "success": {
+    "title": "Application Submitted!",
+    "description": "Thank you for applying to the MA in Natural Resource Management and Sustainable Development. Our admissions team will review your application and contact you shortly regarding the next steps.",
+    "cta_home": "Back to Home",
+    "cta_print": "Print Application"
+  },
+  "steps": [
+    {
+      "id": 1,
+      "title": "Personal"
+    },
+    {
+      "id": 2,
+      "title": "Academic"
+    },
+    {
+      "id": 3,
+      "title": "Experience"
+    },
+    {
+      "id": 4,
+      "title": "Statement"
+    }
+  ],
+  "sections": {
+    "personal": "Personal Information",
+    "academic": "Academic Qualifications",
+    "experience": "Employment & Extras",
+    "statement": "Statement & Declaration"
+  },
+  "fields": {
+    "name": {
+      "label": "Full Name",
+      "placeholder": "First Name"
+    },
+    "surname": {
+      "label": "Surname",
+      "placeholder": "Last Name"
+    },
+    "fatherName": {
+      "label": "Father's/ Husband's Name",
+      "placeholder": ""
+    },
+    "motherName": {
+      "label": "Mother's Name",
+      "placeholder": ""
+    },
+    "dob": {
+      "label": "Date of Birth",
+      "placeholder": ""
+    },
+    "sex": {
+      "label": "Sex",
+      "placeholder": "Select"
+    },
+    "maritalStatus": {
+      "label": "Marital Status",
+      "placeholder": "Select"
+    },
+    "nationality": {
+      "label": "Nationality",
+      "placeholder": ""
+    },
+    "email": {
+      "label": "Email Address",
+      "placeholder": "example@email.com"
+    },
+    "contactNumber": {
+      "label": "Contact Number",
+      "placeholder": "+91"
+    },
+    "aadharNo": {
+      "label": "Aadhar No.",
+      "placeholder": ""
+    },
+    "abcId": {
+      "label": "ABC ID",
+      "placeholder": ""
+    },
+    "presentAddress": {
+      "label": "Present Address",
+      "placeholder": ""
+    },
+    "permanentAddress": {
+      "label": "Permanent Address",
+      "placeholder": ""
+    },
+    "sameAddress": {
+      "label": "Permanent Address same as Present Address",
+      "placeholder": ""
+    },
+    "category": {
+      "label": "Category",
+      "placeholder": "Select"
+    },
+    "hostelRequired": {
+      "label": "Hostel Accommodation Required?",
+      "placeholder": "Select"
+    }
+  },
+  "academic_section": {
+    "headers": [
+      "Exam/Degree Passed",
+      "School/College/Institute",
+      "Board/University",
+      "Year of Passing",
+      "Percentage (%)"
+    ],
+    "add_btn": "Add Qualification",
+    "additional": {
+      "label": "Additional Academic/Professional Qualifications"
+    },
+    "honors": {
+      "label": "Prizes, Honors, Scholarships received"
+    },
+    "languages": {
+      "title": "Language Proficiency",
+      "speak": "Speak",
+      "read": "Read",
+      "write": "Write"
+    }
+  },
+  "experience_section": {
+    "employed": {
+      "label": "Are you presently employed?",
+      "placeholder": "Select"
+    },
+    "orgName": {
+      "label": "Organization Name"
+    },
+    "designation": {
+      "label": "Designation"
+    },
+    "period": {
+      "label": "Working Period"
+    },
+    "reference": {
+      "label": "Reference"
+    },
+    "responsibility": {
+      "label": "Job Responsibility & Achievements"
+    },
+    "hobbies": {
+      "label": "Hobbies"
+    },
+    "extracurriculars": {
+      "label": "Extracurricular Activities"
+    },
+    "source": {
+      "label": "How did you find out about this course?",
+      "placeholder": "Website, Friend, Social Media, etc."
+    }
+  },
+  "statement_section": {
+    "intent": {
+      "label": "Statement of Intent",
+      "note": "Please mention your desire to pursue this course."
+    },
+    "career": {
+      "label": "Career Intent",
+      "note": "How do you intend to utilize this course in your career?"
+    },
+    "declaration": {
+      "title": "Declaration",
+      "text": "hereby declare that the information furnished in this Application Form is complete and true. I have also noted that I will be called for tests and/or personal interview based on the information provided therein, as above. I also agree that the institute has the right to cancel my candidature, if the institute finds that any information provided therein is incomplete, false or misleading or ineligibility being detected before or after the admission.",
+      "accept": "I accept the declaration"
+    },
+    "date": "Date",
+    "place": "Place"
+  },
+  "physical_apply": {
+    "title": "Applying with physical documents?",
+    "description": "You can also download the official application form as a DOCX file, fill it manually, and submit it at our campus.",
+    "cta": "Download Form"
+  }
+}

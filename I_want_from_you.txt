@@ -1,0 +1,77 @@
+### ?? XINRM Website Production Readiness Checklist (V4 - Comprehensive)
+
+The website is now fully **data-driven**. This means all text, statistics, and links are stored in JSON files. Changing these files will update the site immediately. 
+
+To transition from the current prototype to a professional production-grade site, provide the following items and place them in the specified directories.
+
+---
+
+## ?? 1. Visual Assets (Images & Media)
+**Target Directory:** src/assets/ (Create folders like /images, /logos, /people as needed)
+
+*   **Hero Section Visuals:** 
+    *   *Requirement:* Since a drone video is unavailable, provide **3-4 high-resolution (4K) landscape photos** of the Ahmednagar watershed or the Social Centre campus.
+    *   *Current Status:* Using a static Unsplash placeholder.
+*   **Authentic Field Gallery:** 
+    *   *Requirement:* 5-10 professional shots from **MPSM Nashik** and other field visits.
+    *   *Current Status:* Using generic placeholders.
+*   **Institutional Logos (SVG preferred):** 
+    *   *Requirement:* High-res logos for **XINRM**, **Social Centre**, and **Pune Jesuits**.
+    *   *Placement:* src/assets/logos/
+*   **Leadership Portraits:** 
+    *   *Requirement:* Headshots for **Fr. Anthony Samy** (Academic Director) and **Siju Varghese** (Social Centre Director) (1:1 Square ratio, minimum 800x800px).
+    *   *Placement:* src/assets/people/
+
+---
+
+## ?? 2. Core Website Data (Text & Statistics)
+**Target Directory:** src/data/ (Edit these JSON files to update the text)
+
+*   **Impact Metrics (home.json & impact.json):** 
+    *   Provide exact numbers for: *Villages Served, Farmers Trained, SHGs Formed, Liters of Water Recharged*.
+*   **Leadership Names (bout.json):** 
+    *   Names for Fr. Anthony Samy and Siju Varghese are now updated in the code.
+*   **GIS Dashboard Data (impact.json):** 
+    *   Provide current stats for: *Groundwater Level (%), Vegetation Cover (%), and Soil Health Index*.
+*   **Programme Highlights (study.json):** 
+    *   Finalize the bullet points for 'Programme Highlights' and 'Placement Cell' items.
+
+---
+
+## ?? 3. Academic & Official Content
+**Target Directory:** public/documents/ (Create this folder)
+
+*   **Downloadable Resources:** 
+    *   *Requirement:* **PDF versions** of the 'Student Handbook', 'Full Syllabus', and 'Admission Form'.
+    *   *Placement:* Link these in study.json (I will help you set the links once the files are there).
+*   **Accreditation Details (bout.json):** 
+    *   Official trust registration numbers and affiliation text for the 'Legal' section.
+
+---
+
+## ?? 4. Technical Configuration
+**Target Directory:** src/data/global.json
+
+*   **Official Contact Info:** 
+    *   Verified Address, Email (e.g., info@xinrm.edu.in), and Phone Number.
+*   **SEO & Analytics:** 
+    *   **Google Analytics (GA4) ID** (to be added to index.html).
+    *   **Meta Description:** A 160-character summary for Google search results.
+*   **Social Media:** 
+    *   Links to LinkedIn, Instagram, and YouTube.
+
+---
+
+## ? 5. 'Wow' Factor Data (Optional but Recommended)
+*   **Weather-Sync:** Need the **OpenWeatherMap API Key** (I will put this in a .env file).
+*   **Interactive Soil Layering:** High-quality photos of a **Soil Profile (O, A, B, C horizons)** to animate on scroll in the Study page.
+*   **Watershed Simulation:** Technical parameters (Runoff coefficients, slope data) if we want the simulation to be scientifically accurate.
+
+---
+
+### ??? Current Technical Status:
+1.  **Immersive UX:** Fully implemented with cursor followers and topographic parallax.
+2.  **Data Externalization (COMPLETED):** 100% of visible text is now stored in src/data/*.json. You no longer need to touch .tsx code to change words.
+3.  **NRM Animations:** 'Falling Leaves' and 'Growing Tree' are integrated and reactive.
+4.  **Navigation:** Fixed dropdowns and marquee ticker are fully data-driven via 
+avigation.json and home.json.

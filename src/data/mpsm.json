@@ -1,0 +1,82 @@
+{
+  "id": "mpsm-nashik",
+  "title": "Field Immersion: MPSM Nashik",
+  "location": {
+    "name": "Maharashtra Prabodhan Seva Mandal (MPSM), Nashik",
+    "coordinates": [
+      19.9975,
+      73.7898
+    ],
+    "region": "Nashik District, Maharashtra",
+    "focus": "Tribal Development & Watershed Management"
+  },
+  "summary": "A four-day intensive field exposure at MPSM Nashik, where students bridged the gap between academic theory and the practical realities of rural development, tribal livelihoods, and sustainable resource management.",
+  "phases": [
+    {
+      "day": 1,
+      "title": "Orientation & Ethical Immersion",
+      "description": "The journey began with a deep dive into MPSM's 60-year legacy. Students were introduced to the organizational framework and ethical protocols of community engagement, emphasizing respect, cultural sensitivity, and the principle of 'Awakening through Service'."
+    },
+    {
+      "day": 2,
+      "title": "Biodiversity & Traditional Knowledge",
+      "description": "In Pimpalsond village, students documented traditional ecological knowledge. They observed how forest resources like the Mahua tree (Madhuca longifolia) form the bedrock of tribal livelihoods and explored the integration of digital tools like JotForm for remote data collection."
+    },
+    {
+      "day": 3,
+      "title": "Hydrogeology & Water Security",
+      "description": "A technical assessment of groundwater systems in Morda village. Students conducted H₂S water quality tests and measured aquifer depths, gaining firsthand insight into the gendered impact of water scarcity and the vital role of community-trained water volunteers."
+    },
+    {
+      "day": 4,
+      "title": "Reflection & Synthesizing Insights",
+      "description": "The visit concluded with a structured debriefing. Students synthesized observations on climate resilience and community agency, reflecting on the delicate balance of trust-building required in effective grassroots development."
+    }
+  ],
+  "outcomes": [
+    "Practical exposure to community-led Natural Resource Management (NRM).",
+    "Hands-on training in groundwater monitoring and water quality testing.",
+    "Understanding the intersection of tribal rights, biodiversity, and livelihood security.",
+    "Development of ethical field conduct and professional community engagement skills."
+  ],
+  "gallery": [
+    {
+      "url": "/assets/field_visits/MPSM/mpsm-1.jpg",
+      "caption": "Observing biodiversity and forest resource management"
+    },
+    {
+      "url": "/assets/field_visits/MPSM/mpsm-2.jpg",
+      "caption": "Group discussion and reflection at MPSM campus"
+    },
+    {
+      "url": "/assets/field_visits/MPSM/mpsm-3.jpg",
+      "caption": "Groundwater level assessment"
+    },
+    {
+      "url": "/assets/field_visits/MPSM/mpsm-4.jpg",
+      "caption": "Community interaction at Pimpalsond village"
+    },
+    {
+      "url": "/assets/field_visits/MPSM/mpsm-5.jpg",
+      "caption": "Group Photo of XINRM Students with the MPSM Coordinators"
+    }
+  ],
+  "stats": [
+    {
+      "label": "Duration",
+      "value": "4 Days"
+    },
+    {
+      "label": "Communities Engaged",
+      "value": "3+"
+    },
+    {
+      "label": "Field Techniques",
+      "value": "5+"
+    },
+    {
+      "label": "Research Sites",
+      "value": "Nashik Region"
+    }
+  ]
+}

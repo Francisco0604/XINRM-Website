@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1B4332;
+  --color-primary-light: #2D6A4F;
+  --color-primary-hover: #081C15;
+  --color-secondary: #7F5539;
+  --color-accent: #D4AF37;
+  --color-accent-hover: #B8860B;
+  
+  --font-heading: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
+  --font-serif: "Instrument Serif", serif;
+  
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0%); }
+    to { transform: translateX(-100%); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+}
+
+@layer base {
+  body {
+    @apply font-body text-gray-800 bg-white antialiased selection:bg-accent/30 selection:text-primary overflow-x-hidden;
+    font-size: clamp(0.875rem, 0.825rem + 0.25vw, 1rem); /* Refined Fluid Body Text */
+  }
+
+  h1 { font-size: clamp(2.25rem, 6vw + 0.5rem, 7rem); line-height: 1.05; }
+  h2 { font-size: clamp(1.75rem, 5vw + 0.5rem, 4.5rem); line-height: 1.1; }
+  h3 { font-size: clamp(1.5rem, 4vw + 0.25rem, 3rem); line-height: 1.2; }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading text-primary tracking-tight;
+  }
+
+  /* Accessibility & Dark Section Support */
+  .text-white h1, .text-white h2, .text-white h3, .text-white h4, .text-white h5, .text-white h6 {
+    @apply text-white;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-[1440px] mx-auto px-5 sm:px-8 md:px-12 lg:px-20;
+  }
+
+  .section-padding {
+    @apply py-16 md:py-24 lg:py-32;
+  }
+
+  .card-padding {
+    @apply p-6 md:p-8 lg:p-12;
+  }
+
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-2xl border border-white/40 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.08)];
+  }
+
+  .glass-dark {
+    @apply bg-primary/95 backdrop-blur-2xl border border-white/10 shadow-[24px_24px_48px_rgba(0,0,0,0.2)];
+  }
+
+  .topo-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 100 C 20 80, 40 80, 50 100 M50 100 C 60 80, 80 80, 100 100 M0 80 C 20 60, 40 60, 50 80 M50 80 C 60 60, 80 60, 100 80 M0 60 C 20 40, 40 40, 50 60 M50 60 C 60 40, 80 40, 100 60 M0 40 C 20 20, 40 20, 50 40 M50 40 C 60 20, 80 20, 100 40 M0 20 C 20 0, 40 0, 50 20 M50 20 C 60 0, 80 0, 100 20' fill='none' stroke='currentColor' stroke-width='0.5' opacity='0.2'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    animation: topo-parallax 60s linear infinite;
+  }
+
+  @keyframes topo-parallax {
+    from { background-position: 0 0; }
+    to { background-position: 1000px 1000px; }
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center px-6 md:px-10 py-4 md:py-5 rounded-2xl font-black uppercase tracking-widest text-xs transition-all duration-500 transform hover:-translate-y-1 active:scale-95 cursor-pointer overflow-hidden relative min-h-[44px] md:min-h-[48px];
+  }
+
+  .btn::after {
+    content: '';
+    @apply absolute inset-0 bg-white/20 scale-x-0 origin-left transition-transform duration-500 ease-out;
+  }
+
+  .btn:hover::after {
+    @apply scale-x-100;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-hover shadow-xl hover:shadow-primary/30;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-primary hover:bg-accent-hover shadow-xl hover:shadow-accent/30;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-white;
+  }
+
+  .btn-outline-white {
+    @apply border-2 border-white text-white hover:bg-white hover:text-primary;
+  }
+
+  .btn-outline-primary {
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-white shadow-lg hover:shadow-primary/20;
+  }
+
+  .form-input {
+    @apply w-full px-6 py-4 rounded-2xl border-2 border-gray-100 bg-gray-50/50 focus:bg-white focus:border-accent focus:outline-none transition-all duration-300 text-gray-700 font-medium;
+  }
+
+  .section-title {
+    @apply font-black mb-10 text-primary tracking-tighter;
+    font-size: clamp(3rem, 6vw + 1rem, 8rem);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-primary via-primary-light to-accent;
+  }
+}

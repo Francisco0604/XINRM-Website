@@ -1,0 +1,86 @@
+{
+  "hero": {
+    "title": "Our Impact",
+    "description": "Creating ripples of change across rural India through sustainable resource management."
+  },
+  "sidebar": [
+    {
+      "label": "Action Research",
+      "href": "#action-research"
+    },
+    {
+      "label": "Field Visits",
+      "href": "#field-visits"
+    },
+    {
+      "label": "Key Projects",
+      "href": "#projects"
+    },
+    {
+      "label": "Our Network",
+      "href": "#network"
+    }
+  ],
+  "research": {
+    "title": "Participatory Action Research",
+    "quote": "\"Research that doesn't just observe, but acts.\"",
+    "description": "At XINRM, our research methodology is rooted in the Social Centre's history of participatory action. We work directly with rural communities to identify environmental challenges and implement sustainable solutions."
+  },
+  "field_visits": {
+    "title": "Student Field Visits",
+    "badge": "Authentic Field Exposure",
+    "map_cta": "Explore Nashik (MPSM)",
+    "map_title": "Interactive Journey Map",
+    "map_description": "Click on the pins to explore our field visits and research locations.",
+    "featured_label": "Featured Location",
+    "featured": {
+      "location": "MPSM, Nashik",
+      "summary": "Our recent visit to MPSM in Nashik focused on integrated watershed development and sustainable farming practices. Students observed the impact of stone bunding and continuous contour trenches on soil moisture retention.",
+      "stats": [
+        {
+          "value": "5+",
+          "label": "Projects Seen"
+        },
+        {
+          "value": "40",
+          "label": "Students"
+        }
+      ]
+    }
+  },
+  "projects": {
+    "title": "Key Projects",
+    "cta": "Learn More",
+    "items": [
+      {
+        "title": "Self-Help Groups (SHGs)",
+        "desc": "Empowering women through financial independence and community-led decision-making.",
+        "img": "https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&q=80"
+      },
+      {
+        "title": "Watershed Management",
+        "desc": "Restoring groundwater levels in drought-prone villages through technical and community intervention.",
+        "img": "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&q=80"
+      },
+      {
+        "title": "Sustainable Agriculture",
+        "desc": "Promoting organic farming and soil conservation techniques to improve crop yields and farmer livelihoods.",
+        "img": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80"
+      },
+      {
+        "title": "GIS & Remote Sensing",
+        "desc": "Utilizing spatial data and satellite imagery to monitor natural resources and plan precision interventions.",
+        "img": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80"
+      }
+    ]
+  },
+  "network": {
+    "title": "Our Network",
+    "description": "We collaborate with diverse organizations to share knowledge and strengthen local capacity for sustainable development.",
+    "items": [
+      "Partnerships with Government agencies",
+      "Academic connections for collaborative research",
+      "Direct engagement with rural beneficiaries"
+    ]
+  }
+}

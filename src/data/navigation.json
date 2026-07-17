@@ -1,0 +1,74 @@
+{
+  "navigation": [
+    {
+      "name": "Home",
+      "path": "/"
+    },
+    {
+      "name": "About Us",
+      "path": "/about",
+      "submenu": [
+        {
+          "name": "Background & Legacy",
+          "path": "/about#background"
+        },
+        {
+          "name": "Leadership",
+          "path": "/about#leadership"
+        },
+        {
+          "name": "Milestones",
+          "path": "/about#milestones"
+        }
+      ]
+    },
+    {
+      "name": "Impact",
+      "path": "/impact",
+      "submenu": [
+        {
+          "name": "Action Research",
+          "path": "/impact#action-research"
+        },
+        {
+          "name": "Field Visits",
+          "path": "/impact#field-visits"
+        },
+        {
+          "name": "Key Projects",
+          "path": "/impact#projects"
+        },
+        {
+          "name": "Network",
+          "path": "/impact#network"
+        }
+      ]
+    },
+    {
+      "name": "Study",
+      "path": "/study",
+      "submenu": [
+        {
+          "name": "MA Programme",
+          "path": "/study#ma-programme"
+        },
+        {
+          "name": "Curriculum",
+          "path": "/study#curriculum"
+        },
+        {
+          "name": "Facilities",
+          "path": "/study#facilities"
+        },
+        {
+          "name": "Student Support",
+          "path": "/study#support"
+        }
+      ]
+    },
+    {
+      "name": "News",
+      "path": "/news"
+    }
+  ]
+}
