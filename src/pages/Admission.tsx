@@ -16,7 +16,8 @@ import {
   Printer,
   Download,
   AlertTriangle,
-  Award
+  FileCheck,
+  Image as ImageIcon
 } from 'lucide-react'
 import admissionData from '../data/admission.json'
 import { 
@@ -27,7 +28,7 @@ import {
 } from '../utils/applicationExport'
 
 const Admission: React.FC = () => {
-  const { hero, success, sections, fields, academic_section, experience_section, statement_section, physical_apply } = admissionData as any
+  const { hero, success, sections, fields, academic_section, experience_section, documents_section, statement_section, physical_apply } = admissionData as any
 
   // Anti-bot velocity timer
   const formLoadTimestamp = useRef<number>(Date.now())
@@ -88,6 +89,11 @@ const Admission: React.FC = () => {
     extracurriculars_2: '',
     sourceOfInfo: '',
 
+    // Document Files
+    attachedPhotoName: '',
+    attachedDegreeName: '',
+    attachedCategoryName: '',
+
     // Step 4: Statement & Declaration
     statementOfIntent: '',
     careerIntent: '',
@@ -95,6 +101,19 @@ const Admission: React.FC = () => {
     date: new Date().toISOString().split('T')[0],
     place: ''
   })
+
+  // File Objects and Previews
+  const [attachedFiles, setAttachedFiles] = useState<{
+    photo: File | null
+    degree: File | null
+    categoryDoc: File | null
+  }>({
+    photo: null,
+    degree: null,
+    categoryDoc: null
+  })
+
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
 
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -140,6 +159,32 @@ const Admission: React.FC = () => {
         }
       }
     }))
+  }
+
+  const handleFileChange = (docKey: 'photo' | 'degree' | 'categoryDoc', e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null
+    if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setValidationError(`File ${file.name} exceeds 5MB limit. Please upload a smaller file.`)
+        return
+      }
+
+      setAttachedFiles(prev => ({ ...prev, [docKey]: file }))
+
+      if (docKey === 'photo') {
+        setFormData((prev: any) => ({ ...prev, attachedPhotoName: file.name }))
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setPhotoPreview(reader.result as string)
+        }
+        reader.readAsDataURL(file)
+      } else if (docKey === 'degree') {
+        setFormData((prev: any) => ({ ...prev, attachedDegreeName: file.name }))
+      } else if (docKey === 'categoryDoc') {
+        setFormData((prev: any) => ({ ...prev, attachedCategoryName: file.name }))
+      }
+    }
   }
 
   const addQualification = () => {
@@ -212,7 +257,6 @@ const Admission: React.FC = () => {
     }
     
     if (currentStep === 2) {
-      // Must have at least one complete qualification (especially graduation / SSC)
       const filledQuals = formData.qualifications.filter((q: any) => q.exam?.trim() && q.institute?.trim() && q.year?.trim())
       if (filledQuals.length === 0) {
         return { valid: false, error: 'Please provide at least one complete academic qualification with Institute and Year.' }
@@ -327,88 +371,90 @@ const Admission: React.FC = () => {
       return list.length > 0 ? `${lang.toUpperCase()} (${list.join(', ')})` : null
     }).filter(Boolean).join(', ')
 
-    const formattedPayload: Record<string, string> = {
-      "form-name": "admission",
-      "applicationRefId": newRefId,
-      "recipientEmail": "xinrmsocialcentre50@gmail.com",
-      "fullName": fullName,
-      "salutation": sanitizeInput(formData.salutation),
-      "name": cleanName,
-      "surname": cleanSurname,
-      "fatherName": sanitizeInput(formData.fatherName),
-      "motherName": sanitizeInput(formData.motherName),
-      "dob": sanitizeInput(formData.dob),
-      "age": sanitizeInput(formData.age),
-      "sex": sanitizeInput(formData.sex),
-      "maritalStatus": sanitizeInput(formData.maritalStatus),
-      "nationality": sanitizeInput(formData.nationality),
-      "email": sanitizeInput(formData.email),
-      "contactNumber": sanitizeInput(formData.contactNumber),
-      "aadharNo": sanitizeInput(formData.aadharNo),
-      "abcId": sanitizeInput(formData.abcId) || 'N/A',
-      "category": sanitizeInput(formData.category),
-      "hostelRequired": sanitizeInput(formData.hostelRequired),
-      "presentAddress": sanitizeInput(formData.presentAddress),
-      "permanentAddress": sanitizeInput(formData.permanentAddress),
-      "qualifications": qualsText,
-      "additionalQualification": sanitizeInput(formData.additionalQualification) || 'None',
-      "honors": sanitizeInput(formData.honors) || 'None',
-      "languages": langText || 'None specified',
-      "isEmployed": sanitizeInput(formData.isEmployed),
-      "employmentDetails": formData.isEmployed === 'Yes' ? (
-        `Organization: ${sanitizeInput(formData.employmentDetails.orgName)} | Designation: ${sanitizeInput(formData.employmentDetails.designation)} | Period: ${sanitizeInput(formData.employmentDetails.period)} | Ref: ${sanitizeInput(formData.employmentDetails.reference)} | Roles: ${sanitizeInput(formData.employmentDetails.responsibility)}`
-      ) : 'Not Employed',
-      "hobbies": sanitizeInput(formData.hobbies) || 'None',
-      "extracurriculars": `1. ${sanitizeInput(formData.extracurriculars_1) || 'None'} | 2. ${sanitizeInput(formData.extracurriculars_2) || 'None'}`,
-      "sourceOfInfo": sanitizeInput(formData.sourceOfInfo) || 'Website',
-      "statementOfIntent": sanitizeInput(formData.statementOfIntent),
-      "careerIntent": sanitizeInput(formData.careerIntent),
-      "declarationAccepted": "YES (Confirmed by Applicant)",
-      "date": sanitizeInput(formData.date),
-      "place": sanitizeInput(formData.place)
+    // Build standard multi-part FormData for reliable file and field submission
+    const submissionBody = new FormData()
+    submissionBody.append("access_key", "0c11516f-d748-43bb-bb85-021c4355ec6b")
+    submissionBody.append("subject", `🎓 New XINRM M.A. Application: ${fullName} [${newRefId}]`)
+    submissionBody.append("from_name", "XINRM Admissions Portal")
+    submissionBody.append("to", "xinrmsocialcentre50@gmail.com")
+    submissionBody.append("form-name", "admission")
+    submissionBody.append("applicationRefId", newRefId)
+    submissionBody.append("fullName", fullName)
+    submissionBody.append("salutation", sanitizeInput(formData.salutation))
+    submissionBody.append("name", cleanName)
+    submissionBody.append("surname", cleanSurname)
+    submissionBody.append("fatherName", sanitizeInput(formData.fatherName))
+    submissionBody.append("motherName", sanitizeInput(formData.motherName))
+    submissionBody.append("dob", sanitizeInput(formData.dob))
+    submissionBody.append("age", sanitizeInput(formData.age))
+    submissionBody.append("sex", sanitizeInput(formData.sex))
+    submissionBody.append("maritalStatus", sanitizeInput(formData.maritalStatus))
+    submissionBody.append("nationality", sanitizeInput(formData.nationality))
+    submissionBody.append("email", sanitizeInput(formData.email))
+    submissionBody.append("contactNumber", sanitizeInput(formData.contactNumber))
+    submissionBody.append("aadharNo", sanitizeInput(formData.aadharNo))
+    submissionBody.append("abcId", sanitizeInput(formData.abcId) || 'N/A')
+    submissionBody.append("category", sanitizeInput(formData.category))
+    submissionBody.append("hostelRequired", sanitizeInput(formData.hostelRequired))
+    submissionBody.append("presentAddress", sanitizeInput(formData.presentAddress))
+    submissionBody.append("permanentAddress", sanitizeInput(formData.permanentAddress))
+    submissionBody.append("qualifications", qualsText)
+    submissionBody.append("additionalQualification", sanitizeInput(formData.additionalQualification) || 'None')
+    submissionBody.append("honors", sanitizeInput(formData.honors) || 'None')
+    submissionBody.append("languages", langText || 'None specified')
+    submissionBody.append("isEmployed", sanitizeInput(formData.isEmployed))
+    
+    if (formData.isEmployed === 'Yes') {
+      submissionBody.append("employmentDetails", `Organization: ${sanitizeInput(formData.employmentDetails.orgName)} | Designation: ${sanitizeInput(formData.employmentDetails.designation)} | Period: ${sanitizeInput(formData.employmentDetails.period)} | Ref: ${sanitizeInput(formData.employmentDetails.reference)} | Roles: ${sanitizeInput(formData.employmentDetails.responsibility)}`)
+    } else {
+      submissionBody.append("employmentDetails", "Not Employed")
     }
 
-    const encode = (data: Record<string, string>) => {
-      return Object.keys(data)
-        .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
-        .join("&")
+    submissionBody.append("hobbies", sanitizeInput(formData.hobbies) || 'None')
+    submissionBody.append("extracurriculars", `1. ${sanitizeInput(formData.extracurriculars_1) || 'None'} | 2. ${sanitizeInput(formData.extracurriculars_2) || 'None'}`)
+    submissionBody.append("sourceOfInfo", sanitizeInput(formData.sourceOfInfo) || 'Website')
+    submissionBody.append("statementOfIntent", sanitizeInput(formData.statementOfIntent))
+    submissionBody.append("careerIntent", sanitizeInput(formData.careerIntent))
+    submissionBody.append("declarationAccepted", "YES (Confirmed by Applicant)")
+    submissionBody.append("date", sanitizeInput(formData.date))
+    submissionBody.append("place", sanitizeInput(formData.place))
+
+    // Attach documents if provided
+    if (attachedFiles.photo) {
+      submissionBody.append("attachment_photo", attachedFiles.photo, attachedFiles.photo.name)
+    }
+    if (attachedFiles.degree) {
+      submissionBody.append("attachment_degree", attachedFiles.degree, attachedFiles.degree.name)
+    }
+    if (attachedFiles.categoryDoc) {
+      submissionBody.append("attachment_categoryDoc", attachedFiles.categoryDoc, attachedFiles.categoryDoc.name)
     }
 
     try {
-      // 1. Dispatch to Netlify Forms endpoint
-      const netlifyPromise = fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: encode(formattedPayload)
-      }).catch(err => {
-        console.warn('Netlify form submission note:', err)
-        return null
-      })
-
-      // 2. Dispatch email notification to admissions desk
+      // 1. Dispatch to Web3Forms direct email delivery
       const emailPromise = fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({
-          access_key: "0c11516f-d748-43bb-bb85-021c4355ec6b", // Web3Forms public notification bridge
-          subject: `🎓 New XINRM M.A. Application: ${fullName} [${newRefId}]`,
-          from_name: "XINRM Admissions Portal",
-          to: "xinrmsocialcentre50@gmail.com",
-          ...formattedPayload
-        })
+        body: submissionBody
       }).catch(err => {
         console.warn('Direct email dispatch note:', err)
         return null
       })
 
-      // Wait for dispatch attempts
-      await Promise.allSettled([netlifyPromise, emailPromise])
+      // 2. Dispatch to Netlify Form endpoint
+      const netlifyPromise = fetch("/", {
+        method: "POST",
+        body: submissionBody
+      }).catch(err => {
+        console.warn('Netlify form submission note:', err)
+        return null
+      })
+
+      await Promise.allSettled([emailPromise, netlifyPromise])
 
       setIsSubmitted(true)
       window.scrollTo(0, 0)
     } catch (error: any) {
       console.error('Submission error:', error)
-      // Even if network glitches, persist the candidate's confirmation and allow local download
       setIsSubmitted(true)
       window.scrollTo(0, 0)
     } finally {
@@ -452,7 +498,7 @@ const Admission: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
             <button 
               onClick={handleDownloadExcel}
-              className="btn bg-emerald-600 text-white hover:bg-emerald-700 flex items-center justify-center gap-2 py-4 shadow-lg shadow-emerald-600/20 rounded-2xl"
+              className="btn bg-emerald-600 text-white hover:bg-emerald-700 flex items-center justify-center gap-2 py-4 shadow-lg shadow-emerald-600/20 rounded-2xl cursor-pointer"
             >
               <FileSpreadsheet size={20} />
               {success.cta_excel}
@@ -460,7 +506,7 @@ const Admission: React.FC = () => {
 
             <button 
               onClick={() => window.print()} 
-              className="btn btn-outline-primary flex items-center justify-center gap-2 py-4 rounded-2xl"
+              className="btn btn-outline-primary flex items-center justify-center gap-2 py-4 rounded-2xl cursor-pointer"
             >
               <Printer size={20} />
               {success.cta_print}
@@ -468,7 +514,7 @@ const Admission: React.FC = () => {
 
             <button 
               onClick={() => window.location.href = '/'} 
-              className="btn btn-primary flex items-center justify-center gap-2 py-4 rounded-2xl"
+              className="btn btn-primary flex items-center justify-center gap-2 py-4 rounded-2xl cursor-pointer"
             >
               {success.cta_home}
             </button>
@@ -482,9 +528,16 @@ const Admission: React.FC = () => {
                 <p className="text-xs text-gray-500">M.A. in Natural Resource Management and Sustainable Development | Application Dossier</p>
                 <p className="text-xs text-accent font-bold mt-1">Application Reference: {refId}</p>
               </div>
-              <div className="text-right text-xs text-gray-400">
-                <p>Date: {formData.date}</p>
-                <p>Status: <span className="text-emerald-600 font-bold">SUBMITTED</span></p>
+              <div className="flex gap-4 items-center">
+                {photoPreview && (
+                  <div className="w-16 h-20 border-2 border-primary/20 rounded-lg overflow-hidden bg-white shadow-sm shrink-0">
+                    <img src={photoPreview} alt="Candidate" className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="text-right text-xs text-gray-400">
+                  <p>Date: {formData.date}</p>
+                  <p>Status: <span className="text-emerald-600 font-bold">SUBMITTED</span></p>
+                </div>
               </div>
             </div>
 
@@ -542,6 +595,15 @@ const Admission: React.FC = () => {
                 </table>
               </div>
             </div>
+
+            {(formData.attachedPhotoName || formData.attachedDegreeName || formData.attachedCategoryName) && (
+              <div className="pt-2">
+                <span className="font-bold text-gray-400 text-xs block uppercase mb-1">Attached Digital Documents</span>
+                <p className="text-xs text-gray-600">
+                  {[formData.attachedPhotoName && `Photo: ${formData.attachedPhotoName}`, formData.attachedDegreeName && `Degree: ${formData.attachedDegreeName}`, formData.attachedCategoryName && `Category: ${formData.attachedCategoryName}`].filter(Boolean).join(' | ')}
+                </p>
+              </div>
+            )}
 
             <div className="border-t border-gray-200 pt-4 flex justify-between items-center text-xs text-gray-500">
               <span>Declaration Verified: <strong className="text-emerald-700">Agreed & Digital Signed</strong></span>
@@ -900,7 +962,7 @@ const Admission: React.FC = () => {
                     + {academic_section.add_btn}
                   </button>
 
-                  {/* Language Proficiency Grid with Full Row Click Targets */}
+                  {/* Language Proficiency Grid */}
                   <div className="space-y-4 pt-4 border-t border-gray-100">
                     <h3 className="font-bold text-primary uppercase tracking-widest text-xs">{academic_section.languages.title}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -947,7 +1009,7 @@ const Admission: React.FC = () => {
                 </motion.div>
               )}
 
-              {/* STEP 3: EMPLOYMENT & EXTRACURRICULARS */}
+              {/* STEP 3: EMPLOYMENT, EXTRACURRICULARS & DOCUMENTS */}
               {step === 3 && (
                 <motion.div 
                   key="step3"
@@ -962,7 +1024,7 @@ const Admission: React.FC = () => {
                     </div>
                     <div>
                       <h2 className="text-2xl md:text-3xl font-bold text-primary">{sections.experience}</h2>
-                      <p className="text-xs text-gray-400">Professional background, activities, and personal interests</p>
+                      <p className="text-xs text-gray-400">Professional background, activities, and digital document uploads</p>
                     </div>
                   </div>
 
@@ -1026,14 +1088,89 @@ const Admission: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{experience_section.hobbies.label}</label>
-                      <input type="text" name="hobbies" value={formData.hobbies} onChange={handleInputChange} className="form-input" placeholder={experience_section.hobbies.placeholder} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{experience_section.hobbies.label}</label>
+                        <input type="text" name="hobbies" value={formData.hobbies} onChange={handleInputChange} className="form-input" placeholder={experience_section.hobbies.placeholder} />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{experience_section.source.label}</label>
+                        <input type="text" name="sourceOfInfo" value={formData.sourceOfInfo} onChange={handleInputChange} className="form-input" placeholder={experience_section.source.placeholder} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* DIGITAL DOCUMENT ATTACHMENTS (OPTIONAL) */}
+                  <div className="space-y-6 pt-4 border-t border-gray-100">
+                    <div>
+                      <h3 className="font-bold text-primary uppercase tracking-widest text-xs flex items-center gap-2">
+                        <Upload size={16} className="text-accent" />
+                        {documents_section.title}
+                      </h3>
+                      <p className="text-xs text-gray-400 mt-1">{documents_section.description}</p>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{experience_section.source.label}</label>
-                      <input type="text" name="sourceOfInfo" value={formData.sourceOfInfo} onChange={handleInputChange} className="form-input" placeholder={experience_section.source.placeholder} />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {/* Photo Upload */}
+                      <div className="border-2 border-dashed border-gray-200 rounded-3xl p-6 text-center hover:border-primary transition-colors bg-gray-50/50">
+                        <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center mx-auto mb-3 text-primary">
+                          <ImageIcon size={24} />
+                        </div>
+                        <label className="text-xs font-bold text-gray-700 block mb-1">{documents_section.photo.label}</label>
+                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.photo.hint}</p>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={(e) => handleFileChange('photo', e)} 
+                          className="text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
+                        />
+                        {attachedFiles.photo && (
+                          <div className="mt-2 text-emerald-600 text-xs font-bold flex items-center justify-center gap-1">
+                            <FileCheck size={14} /> {attachedFiles.photo.name}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Degree Upload */}
+                      <div className="border-2 border-dashed border-gray-200 rounded-3xl p-6 text-center hover:border-primary transition-colors bg-gray-50/50">
+                        <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center mx-auto mb-3 text-primary">
+                          <GraduationCap size={24} />
+                        </div>
+                        <label className="text-xs font-bold text-gray-700 block mb-1">{documents_section.degree.label}</label>
+                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.degree.hint}</p>
+                        <input 
+                          type="file" 
+                          accept="application/pdf,image/*" 
+                          onChange={(e) => handleFileChange('degree', e)} 
+                          className="text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
+                        />
+                        {attachedFiles.degree && (
+                          <div className="mt-2 text-emerald-600 text-xs font-bold flex items-center justify-center gap-1">
+                            <FileCheck size={14} /> {attachedFiles.degree.name}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Category Certificate Upload */}
+                      <div className="border-2 border-dashed border-gray-200 rounded-3xl p-6 text-center hover:border-primary transition-colors bg-gray-50/50">
+                        <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center mx-auto mb-3 text-primary">
+                          <FileText size={24} />
+                        </div>
+                        <label className="text-xs font-bold text-gray-700 block mb-1">{documents_section.categoryDoc.label}</label>
+                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.categoryDoc.hint}</p>
+                        <input 
+                          type="file" 
+                          accept="application/pdf,image/*" 
+                          onChange={(e) => handleFileChange('categoryDoc', e)} 
+                          className="text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
+                        />
+                        {attachedFiles.categoryDoc && (
+                          <div className="mt-2 text-emerald-600 text-xs font-bold flex items-center justify-center gap-1">
+                            <FileCheck size={14} /> {attachedFiles.categoryDoc.name}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -1164,7 +1301,7 @@ const Admission: React.FC = () => {
                 <button 
                   type="button" 
                   onClick={nextStep} 
-                  className="btn btn-primary flex items-center justify-center gap-2 px-10 py-4 shadow-xl shadow-primary/20"
+                  className="btn btn-primary flex items-center justify-center gap-2 px-10 py-4 shadow-xl shadow-primary/20 cursor-pointer"
                 >
                   Next Step <ChevronRight size={20} />
                 </button>
@@ -1172,7 +1309,7 @@ const Admission: React.FC = () => {
                 <button 
                   type="submit" 
                   disabled={!formData.declarationAccepted || isSubmitting}
-                  className={`btn btn-accent flex items-center justify-center gap-2 px-12 py-5 text-base shadow-2xl shadow-accent/20 ${(!formData.declarationAccepted || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`btn btn-accent flex items-center justify-center gap-2 px-12 py-5 text-base shadow-2xl shadow-accent/20 cursor-pointer ${(!formData.declarationAccepted || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {isSubmitting ? 'Recording Application...' : 'Submit Application'} <ArrowRight size={20} className="ml-2" />
                 </button>

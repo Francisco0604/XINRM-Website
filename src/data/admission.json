@@ -181,6 +181,22 @@
       "placeholder": "Select or type source"
     }
   },
+  "documents_section": {
+    "title": "Digital Document Attachments (Optional / Self-Attested)",
+    "description": "Upload copies of your passport photo and certificates if applying online (Max 5MB each).",
+    "photo": {
+      "label": "Passport Photograph",
+      "hint": "Recent passport size photo (JPG/PNG)"
+    },
+    "degree": {
+      "label": "Graduation Marksheet / Certificate",
+      "hint": "Degree or final year marksheet (PDF/JPG)"
+    },
+    "categoryDoc": {
+      "label": "Category / Caste Certificate",
+      "hint": "Required for SC/ST/NT/PWD/Minority (PDF/JPG)"
+    }
+  },
   "statement_section": {
     "intent": {
       "label": "Desire to Pursue this Course (Statement of Intent)",
