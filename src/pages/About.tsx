@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { History, Award, Shield, Users } from 'lucide-react'
+import { History, Award, Shield, Users, ChevronDown } from 'lucide-react'
 import QuickLinks from '../components/QuickLinks'
 import aboutData from '../data/about.json'
 
@@ -19,8 +19,35 @@ const About: React.FC = () => {
       title: string
       members: LeadershipMember[]
     }
-    milestones: any
+    milestones: {
+      title: string
+      items: { year: string; title: string; text: string }[]
+    }
     legal: any
+  }
+
+  const [expandedIndices, setExpandedIndices] = useState<Record<number, boolean>>({})
+  const [allExpanded, setAllExpanded] = useState<boolean>(false)
+
+  const toggleMilestone = (index: number) => {
+    setExpandedIndices(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }))
+  }
+
+  const toggleExpandAll = () => {
+    if (allExpanded) {
+      setExpandedIndices({})
+      setAllExpanded(false)
+    } else {
+      const expanded: Record<number, boolean> = {}
+      milestones.items.forEach((_, idx) => {
+        expanded[idx] = true
+      })
+      setExpandedIndices(expanded)
+      setAllExpanded(true)
+    }
   }
 
   return (
@@ -155,19 +182,67 @@ const About: React.FC = () => {
               </div>
 
               <div id="milestones" className="scroll-mt-32">
-                <div className="flex items-center gap-4 mb-12 md:mb-16">
-                  <div className="p-3 bg-accent/10 rounded-2xl shrink-0">
-                    <Award className="text-accent" size={28} />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 md:mb-12">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-accent/10 rounded-2xl shrink-0">
+                      <Award className="text-accent" size={28} />
+                    </div>
+                    <h2 className="font-bold text-primary leading-tight text-3xl md:text-5xl">{milestones.title}</h2>
                   </div>
-                  <h2 className="font-bold text-primary leading-tight text-3xl md:text-5xl">{milestones.title}</h2>
+                  <button 
+                    onClick={toggleExpandAll}
+                    className="px-6 py-2.5 rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all text-xs font-bold uppercase tracking-wider cursor-pointer w-fit shrink-0"
+                  >
+                    {allExpanded ? 'Collapse All' : 'Expand All'}
+                  </button>
                 </div>
-                <div className="relative border-l-2 border-accent/20 ml-4 pl-8 md:pl-12 space-y-12 md:space-y-16">
+                
+                <div className="relative border-l-2 border-accent/20 ml-4 pl-8 md:pl-12 space-y-6">
                   {milestones.items.map((m: any, i: number) => (
-                    <div key={i} className="relative">
-                      <div className="absolute -left-[41px] md:-left-[49px] top-1 w-5 h-5 bg-accent rounded-full border-4 border-white shadow-xl shadow-accent/20"></div>
-                      <span className="text-accent text-2xl md:text-3xl font-black mb-1 md:mb-2 block font-serif italic">{m.year}</span>
-                      <h4 className="text-lg md:text-xl font-bold text-primary mb-2 md:mb-3">{m.title}</h4>
-                      <p className="text-gray-500 text-sm md:text-lg leading-relaxed font-light">{m.text}</p>
+                    <div 
+                      key={i} 
+                      className="relative group cursor-pointer select-none"
+                      onClick={() => toggleMilestone(i)}
+                    >
+                      {/* Timeline dot */}
+                      <div className={`absolute -left-[41px] md:-left-[49px] top-4 w-5 h-5 rounded-full border-4 border-white shadow-xl transition-all duration-300 ${
+                        expandedIndices[i] 
+                          ? 'bg-accent scale-110 shadow-accent/40' 
+                          : 'bg-gray-300 group-hover:bg-accent/70'
+                      }`}></div>
+
+                      <div className={`glass-card p-5 md:p-6 rounded-2xl border transition-all duration-300 ${
+                        expandedIndices[i]
+                          ? 'border-accent/40 bg-accent/5 shadow-md shadow-accent/5'
+                          : 'border-gray-100 hover:border-accent/30 hover:shadow-md'
+                      }`}>
+                        <div className="flex items-center justify-between gap-4">
+                          <div>
+                            <span className="text-accent text-lg md:text-xl font-black mb-1 block font-serif italic">{m.year}</span>
+                            <h4 className="text-base md:text-lg font-bold text-primary leading-tight">{m.title}</h4>
+                          </div>
+                          <motion.div 
+                            animate={{ rotate: expandedIndices[i] ? 180 : 0 }}
+                            className="text-gray-400 group-hover:text-primary transition-colors shrink-0"
+                          >
+                            <ChevronDown size={20} />
+                          </motion.div>
+                        </div>
+
+                        <motion.div
+                          initial={false}
+                          animate={{ 
+                            height: expandedIndices[i] ? 'auto' : 0, 
+                            opacity: expandedIndices[i] ? 1 : 0 
+                          }}
+                          transition={{ duration: 0.25, ease: 'easeInOut' }}
+                          className="overflow-hidden"
+                        >
+                          <p className="text-gray-500 text-sm md:text-base leading-relaxed font-light mt-4 pt-4 border-t border-gray-100">
+                            {m.text}
+                          </p>
+                        </motion.div>
+                      </div>
                     </div>
                   ))}
                 </div>

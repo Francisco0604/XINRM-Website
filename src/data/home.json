@@ -2,7 +2,7 @@
   "hero": {
     "badge": "Pioneering Sustainable Futures",
     "title": "Nurturing Leaders",
-    "description": "Empowering communities and restoring nature through 50 years of on-ground excellence.",
+    "description": "Empowering communities and restoring nature through 60 years of on-ground excellence.",
     "cta_primary": "Our Story",
     "cta_secondary": "Explore MA Programme"
   },
@@ -22,9 +22,9 @@
       "suffix": "+"
     },
     {
-      "num": "342",
+      "num": "500",
       "label": "SHGs Formed",
-      "suffix": ""
+      "suffix": "+"
     },
     {
       "num": "1.2M",

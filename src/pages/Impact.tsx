@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Rocket, Network, Share2, MapPin, X, ZoomIn } from 'lucide-react'
+import { Rocket, Network, Share2, MapPin, X, ZoomIn, ChevronLeft, ChevronRight } from 'lucide-react'
 import QuickLinks from '../components/QuickLinks'
 import { motion, AnimatePresence } from 'framer-motion'
 import impactData from '../data/impact.json'
@@ -8,7 +8,22 @@ import FieldMap from '../components/FieldMap'
 
 const Impact: React.FC = () => {
   const { hero, sidebar, research, field_visits, projects, network } = impactData
-  const [selectedImage, setSelectedImage] = useState<any>(null)
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(-1)
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedImageIndex < 0) return
+      if (e.key === 'ArrowLeft') {
+        setSelectedImageIndex((prev) => (prev === 0 ? mpsmData.gallery.length - 1 : prev - 1))
+      } else if (e.key === 'ArrowRight') {
+        setSelectedImageIndex((prev) => (prev === mpsmData.gallery.length - 1 ? 0 : prev + 1))
+      } else if (e.key === 'Escape') {
+        setSelectedImageIndex(-1)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedImageIndex])
 
   const mpsmMapData = {
     coordinates: mpsmData.location.coordinates as [number, number],
@@ -41,30 +56,58 @@ const Impact: React.FC = () => {
 
       {/* Lightbox for Gallery */}
       <AnimatePresence>
-        {selectedImage && (
+        {selectedImageIndex >= 0 && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setSelectedImage(null)}
             className="fixed inset-0 z-[100] bg-primary/95 backdrop-blur-xl flex flex-col items-center justify-center p-6"
+            onClick={() => setSelectedImageIndex(-1)}
           >
-            <button className="absolute top-10 right-10 text-white/50 hover:text-white transition-colors">
-              <X size={48} />
+            <button 
+              className="absolute top-6 right-6 md:top-10 md:right-10 text-white/50 hover:text-white transition-colors cursor-pointer z-50"
+              onClick={(e) => { e.stopPropagation(); setSelectedImageIndex(-1); }}
+            >
+              <X size={40} />
             </button>
+
+            {/* Left Arrow */}
+            <button 
+              className="absolute left-4 md:left-10 text-white/50 hover:text-white transition-colors cursor-pointer z-50 p-2 bg-black/20 hover:bg-black/40 rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImageIndex((prev) => (prev === 0 ? mpsmData.gallery.length - 1 : prev - 1));
+              }}
+            >
+              <ChevronLeft size={36} />
+            </button>
+
             <motion.div 
-              layoutId={`gallery-${selectedImage.url}`}
-              className="max-w-5xl w-full aspect-video rounded-3xl overflow-hidden shadow-2xl relative"
+              layoutId={`gallery-${mpsmData.gallery[selectedImageIndex].url}`}
+              className="max-w-5xl w-full aspect-[4/3] md:aspect-video rounded-3xl overflow-hidden shadow-2xl relative"
+              onClick={(e) => e.stopPropagation()}
             >
               <img 
-                src={selectedImage.url} 
-                alt={selectedImage.caption} 
+                src={mpsmData.gallery[selectedImageIndex].url} 
+                alt={mpsmData.gallery[selectedImageIndex].caption} 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute bottom-0 left-0 right-0 p-12 bg-gradient-to-t from-black/80 to-transparent">
-                 <p className="text-white text-xl md:text-2xl font-bold italic tracking-wide">{selectedImage.caption}</p>
+              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
+                 <p className="text-white text-lg md:text-2xl font-bold italic tracking-wide">{mpsmData.gallery[selectedImageIndex].caption}</p>
+                 <p className="text-gray-400 text-xs md:text-sm mt-1">{selectedImageIndex + 1} of {mpsmData.gallery.length}</p>
               </div>
             </motion.div>
+
+            {/* Right Arrow */}
+            <button 
+              className="absolute right-4 md:right-10 text-white/50 hover:text-white transition-colors cursor-pointer z-50 p-2 bg-black/20 hover:bg-black/40 rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImageIndex((prev) => (prev === mpsmData.gallery.length - 1 ? 0 : prev + 1));
+              }}
+            >
+              <ChevronRight size={36} />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -190,24 +233,37 @@ const Impact: React.FC = () => {
 
                 {/* Authentic Gallery */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
-                  {mpsmData.gallery.map((img, i) => (
-                    <motion.div 
-                      layoutId={`gallery-${img.url}`}
-                      key={i}
-                      whileHover={{ scale: 1.05, zIndex: 10 }}
-                      onClick={() => setSelectedImage(img)}
-                      className="aspect-square rounded-xl md:rounded-2xl overflow-hidden shadow-md relative group cursor-pointer"
-                    >
-                      <img 
-                        src={img.url} 
-                        alt={img.caption} 
-                        className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <ZoomIn className="text-white" size={32} />
-                      </div>
-                    </motion.div>
-                  ))}
+                  {mpsmData.gallery.slice(0, 5).map((img, i) => {
+                    const isLast = i === 4;
+                    const remainingCount = mpsmData.gallery.length - 5;
+                    return (
+                      <motion.div 
+                        layoutId={`gallery-${img.url}`}
+                        key={i}
+                        whileHover={{ scale: 1.05, zIndex: 10 }}
+                        onClick={() => setSelectedImageIndex(i)}
+                        className="aspect-square rounded-xl md:rounded-2xl overflow-hidden shadow-md relative group cursor-pointer"
+                      >
+                        <img 
+                          src={img.url} 
+                          alt={img.caption} 
+                          className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+                        />
+                        {isLast && remainingCount > 0 ? (
+                          <div className="absolute inset-0 bg-primary/80 flex flex-col items-center justify-center transition-all group-hover:bg-primary/95">
+                            <span className="text-white text-3xl md:text-4xl font-black">+{remainingCount}</span>
+                            <span className="text-accent text-[10px] md:text-xs font-bold mt-2 uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              View More Images
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <ZoomIn className="text-white" size={32} />
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </div>
 

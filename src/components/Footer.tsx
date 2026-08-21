@@ -49,7 +49,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-4 md:space-y-6">
               {[
                 { name: 'Our Legacy', path: '/about' },
-                { name: 'MA Admissions', path: '/study' },
+                { name: 'MA Admissions', path: '/admission' },
                 { name: 'Impact Stories', path: '/impact' },
                 { name: 'Latest Notices', path: '/news' },
               ].map((link) => (
@@ -107,7 +107,7 @@ const Footer: React.FC = () => {
           </p>
           <div className="flex flex-wrap justify-center gap-6 md:gap-10">
             {footer.legalLinks.map((link, i) => (
-              <a key={i} href={link.path} className="text-gray-500 hover:text-white transition-colors text-xs font-medium uppercase tracking-widest">{link.name}</a>
+              <Link key={i} to={link.path} className="text-gray-500 hover:text-white transition-colors text-xs font-medium uppercase tracking-widest">{link.name}</Link>
             ))}
           </div>
         </div>

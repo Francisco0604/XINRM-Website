@@ -1,6 +1,6 @@
-import React from 'react'
-import { motion } from 'framer-motion'
-import { Globe, Droplets, Leaf, Users, ArrowRight, CheckCircle, GraduationCap, Play } from 'lucide-react'
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Globe, Droplets, Leaf, Users, ArrowRight, CheckCircle, GraduationCap, Play, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import GrowingTree from '../components/GrowingTree'
 import FallingLeaves from '../components/FallingLeaves'
@@ -10,6 +10,7 @@ const iconMap: Record<string, any> = { Globe, Droplets, Leaf, Users }
 
 const Home: React.FC = () => {
   const { hero, marquee, stats, sdgs, academic, impact } = homeData
+  const [showVideo, setShowVideo] = useState<boolean>(false)
 
   return (
     <div className="overflow-x-hidden">
@@ -166,7 +167,10 @@ const Home: React.FC = () => {
                 transition={{ duration: 0.8, ease: "easeOut" }}
                 className="aspect-[4/5] bg-white/5 p-3 md:p-4 rounded-[2rem] md:rounded-[3rem] backdrop-blur-sm border border-white/10 shadow-2xl relative"
               >
-                <div className="w-full h-full rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden relative group">
+                <div 
+                  onClick={() => setShowVideo(true)}
+                  className="w-full h-full rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden relative group cursor-pointer"
+                >
                   <img 
                     src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80" 
                     alt="Students in Field" 
@@ -176,7 +180,7 @@ const Home: React.FC = () => {
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 md:p-12">
                       <motion.div 
                         whileHover={{ scale: 1.1 }}
-                        className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-accent flex items-center justify-center mb-6 md:mb-8 shadow-2xl cursor-pointer"
+                        className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-accent flex items-center justify-center mb-6 md:mb-8 shadow-2xl"
                       >
                         <Play size={32} className="text-primary fill-primary ml-1" />
                       </motion.div>
@@ -184,6 +188,40 @@ const Home: React.FC = () => {
                   </div>
                 </div>
               </motion.div>
+
+              {/* Video Modal Lightbox */}
+              <AnimatePresence>
+                {showVideo && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-[100] bg-primary/95 backdrop-blur-xl flex flex-col items-center justify-center p-4 md:p-6"
+                    onClick={() => setShowVideo(false)}
+                  >
+                    <button 
+                      className="absolute top-6 right-6 md:top-10 md:right-10 text-white/50 hover:text-white transition-colors cursor-pointer z-50 animate-bounce"
+                      onClick={() => setShowVideo(false)}
+                    >
+                      <X size={40} />
+                    </button>
+                    <motion.div 
+                      initial={{ scale: 0.95, y: 20 }}
+                      animate={{ scale: 1, y: 0 }}
+                      exit={{ scale: 0.95, y: 20 }}
+                      className="max-w-5xl w-full aspect-video rounded-3xl overflow-hidden shadow-2xl relative bg-black border border-white/10"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <video 
+                        src="/assets/videos/Watch_our_students_in_action.mp4" 
+                        controls 
+                        autoPlay 
+                        className="w-full h-full object-contain"
+                      />
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               
               {/* Floating Stat Card - Repositioned for mobile */}
               <motion.div 

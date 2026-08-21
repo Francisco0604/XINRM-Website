@@ -19,6 +19,10 @@
     {
       "label": "Student Support",
       "href": "#support"
+    },
+    {
+      "label": "Student Activities",
+      "href": "#activities"
     }
   ],
   "programme": {
@@ -52,6 +56,52 @@
       {
         "component": "Field Work",
         "details": "Village stays and Participatory Action Research"
+      }
+    ],
+    "semesters": [
+      {
+        "name": "Semester I",
+        "courses": [
+          "Natural Resource Management",
+          "Sustainable Development",
+          "Socio, Eco & Political NRM",
+          "Field Practicum I",
+          "Water & Soil Testing Lab",
+          "Research Methodology"
+        ]
+      },
+      {
+        "name": "Semester II",
+        "courses": [
+          "Water, Soil & Plants Management",
+          "Development Practices",
+          "Methods of Social Work",
+          "Good Governance",
+          "Field Practicum II",
+          "OJT (On Job Training)"
+        ]
+      },
+      {
+        "name": "Semester III",
+        "courses": [
+          "Climate Change & Mitigations",
+          "GIS and Remote Sensing",
+          "Project Management",
+          "Field Practicum III",
+          "Biodiversity / NGO Management",
+          "Research Project"
+        ]
+      },
+      {
+        "name": "Semester IV",
+        "courses": [
+          "Disaster Management",
+          "Financial Management",
+          "Field Practicum IV",
+          "Sustainable Livelihoods",
+          "Specialized Practicum",
+          "Final Dissertation"
+        ]
       }
     ]
   },
@@ -114,6 +164,65 @@
       {
         "label": "Action Potential",
         "desc": "Based on field experience"
+      }
+    ]
+  },
+  "activities": {
+    "title": "Student Activities & Campus Life",
+    "description": "Life at XINRM is vibrant, collaborative, and deeply connected. From academic celebrations to hands-on civic exposure, our students build memories and compile research.",
+    "categories": [
+      {
+        "id": "farewell-2026",
+        "name": "Farewell 2026",
+        "desc": "Celebrating the graduating batch of 2026 with academic and cultural reflections.",
+        "images": [
+          { "url": "/assets/student_activities/farewell_2026/1.jpeg", "caption": "Batch of 2026 farewell celebration" },
+          { "url": "/assets/student_activities/farewell_2026/2.jpeg", "caption": "Students sharing experiences and memories" },
+          { "url": "/assets/student_activities/farewell_2026/3.jpeg", "caption": "XINRM faculty addressing the graduating class" },
+          { "url": "/assets/student_activities/farewell_2026/4.jpeg", "caption": "Cultural performances by junior batch students" },
+          { "url": "/assets/student_activities/farewell_2026/5.jpeg", "caption": "Token of appreciation and academic awards" },
+          { "url": "/assets/student_activities/farewell_2026/6.jpeg", "caption": "Group portrait of the graduates and instructors" }
+        ]
+      },
+      {
+        "id": "teachers-day",
+        "name": "Teacher's Day",
+        "desc": "A student-organized event honoring the dedication of XINRM mentors and field coordinators.",
+        "images": [
+          { "url": "/assets/student_activities/teachers_day/1.jpeg", "caption": "Inauguration and lamp lighting ceremony" },
+          { "url": "/assets/student_activities/teachers_day/2.jpeg", "caption": "Student speech expressing gratitude to the faculty" },
+          { "url": "/assets/student_activities/teachers_day/3.jpeg", "caption": "Interactive games and celebrations with teachers" }
+        ]
+      },
+      {
+        "id": "municipal-corporation",
+        "name": "Municipal Corporation Visit",
+        "desc": "Field exposure visit to study urban planning, sanitation, and municipal solid waste management systems.",
+        "report_url": "/documents/Field_Report_Municipal_Corporation.docx",
+        "report_name": "Field Report - Municipal Corporation.docx",
+        "images": [
+          { "url": "/assets/student_activities/municipal_corporation/1.jpeg", "caption": "Briefing by municipal corporation officers" },
+          { "url": "/assets/student_activities/municipal_corporation/2.jpeg", "caption": "Observing the urban solid waste processing facility" },
+          { "url": "/assets/student_activities/municipal_corporation/3.jpeg", "caption": "Interactive discussion on municipal NRM frameworks" }
+        ]
+      },
+      {
+        "id": "other-activities",
+        "name": "Other Activities",
+        "desc": "Cultural programs, farewell celebrations, and community engagement sessions.",
+        "images": [
+          { "url": "/assets/student_activities/other_activities/1.jpeg", "caption": "Batch of 2025 farewell ceremony and dinner" },
+          { "url": "/assets/student_activities/other_activities/2.jpeg", "caption": "Student orientation and induction program" },
+          { "url": "/assets/student_activities/other_activities/3.jpeg", "caption": "Campus academic and research presentations" },
+          { "url": "/assets/student_activities/other_activities/4.jpeg", "caption": "Student interactive session with experts" },
+          { "url": "/assets/student_activities/other_activities/5.jpeg", "caption": "Cooperative learning and group work dynamics" },
+          { "url": "/assets/student_activities/other_activities/6.jpeg", "caption": "Community resource mapping preparation" },
+          { "url": "/assets/student_activities/other_activities/7.jpeg", "caption": "XINRM student group learning activity" },
+          { "url": "/assets/student_activities/other_activities/8.jpeg", "caption": "Participatory rural appraisal planning session" },
+          { "url": "/assets/student_activities/other_activities/9.jpeg", "caption": "Discussion on sustainable development frameworks" },
+          { "url": "/assets/student_activities/other_activities/10.jpeg", "caption": "Academic feedback and semester review" },
+          { "url": "/assets/student_activities/other_activities/11.jpeg", "caption": "Group celebration and student bonding session" }
+        ]
       }
     ]
   }

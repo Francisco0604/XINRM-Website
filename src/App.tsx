@@ -6,6 +6,9 @@ import Study from './pages/Study'
 import News from './pages/News'
 import Contact from './pages/Contact'
 import Admission from './pages/Admission'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsConditions from './pages/TermsConditions'
+import AdmissionsNotice from './pages/AdmissionsNotice'
 import Layout from './components/Layout'
 import ScrollToTop from './components/ScrollToTop'
 
@@ -22,6 +25,9 @@ function App() {
           <Route path="/news" element={<News />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admission" element={<Admission />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsConditions />} />
+          <Route path="/news/admissions-open" element={<AdmissionsNotice />} />
         </Routes>
       </Layout>
     </Router>

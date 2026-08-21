@@ -2,13 +2,15 @@
   "hero": {
     "badge": "Admissions 2026-2027",
     "title": "Application Form",
-    "description": "Join the next generation of leaders in Natural Resource Management. Please fill out the details below carefully."
+    "affiliation": "Social Centre's Xavier Institute of Natural Resource Management (Recognized by Savitribai Phule Pune University)",
+    "description": "Join the next generation of leaders in Natural Resource Management and Sustainable Development. Please fill out all required details carefully."
   },
   "success": {
-    "title": "Application Submitted!",
-    "description": "Thank you for applying to the MA in Natural Resource Management and Sustainable Development. Our admissions team will review your application and contact you shortly regarding the next steps.",
+    "title": "Application Submitted Successfully!",
+    "description": "Thank you for applying to the MA in Natural Resource Management and Sustainable Development. Your application dossier has been recorded and submitted to the admissions cell at xinrmsocialcentre50@gmail.com. You can download your official application spreadsheet or print your signed summary below.",
     "cta_home": "Back to Home",
-    "cta_print": "Print Application"
+    "cta_print": "Print / Save Application (PDF)",
+    "cta_excel": "Download Spreadsheet (.xlsx)"
   },
   "steps": [
     {
@@ -30,13 +32,17 @@
   ],
   "sections": {
     "personal": "Personal Information",
-    "academic": "Academic Qualifications",
-    "experience": "Employment & Extras",
-    "statement": "Statement & Declaration"
+    "academic": "Academic Qualifications & Languages",
+    "experience": "Employment & Extracurriculars",
+    "statement": "Statement of Intent & Declaration"
   },
   "fields": {
+    "salutation": {
+      "label": "Title",
+      "placeholder": "Select"
+    },
     "name": {
-      "label": "Full Name",
+      "label": "First Name",
       "placeholder": "First Name"
     },
     "surname": {
@@ -44,19 +50,23 @@
       "placeholder": "Last Name"
     },
     "fatherName": {
-      "label": "Father's/ Husband's Name",
-      "placeholder": ""
+      "label": "Father's / Husband's Name",
+      "placeholder": "Full Name"
     },
     "motherName": {
       "label": "Mother's Name",
-      "placeholder": ""
+      "placeholder": "Full Name"
     },
     "dob": {
       "label": "Date of Birth",
-      "placeholder": ""
+      "placeholder": "DD/MM/YYYY"
+    },
+    "age": {
+      "label": "Age (Years)",
+      "placeholder": "Auto-calculated"
     },
     "sex": {
-      "label": "Sex",
+      "label": "Sex / Gender",
       "placeholder": "Select"
     },
     "maritalStatus": {
@@ -65,31 +75,31 @@
     },
     "nationality": {
       "label": "Nationality",
-      "placeholder": ""
+      "placeholder": "e.g. Indian"
     },
     "email": {
       "label": "Email Address",
-      "placeholder": "example@email.com"
+      "placeholder": "name@example.com"
     },
     "contactNumber": {
-      "label": "Contact Number",
-      "placeholder": "+91"
+      "label": "Contact Number (10-Digit Mobile)",
+      "placeholder": "9876543210"
     },
     "aadharNo": {
-      "label": "Aadhar No.",
-      "placeholder": ""
+      "label": "Aadhaar No. (12 Digits)",
+      "placeholder": "1234 5678 9012"
     },
     "abcId": {
-      "label": "ABC ID",
-      "placeholder": ""
+      "label": "ABC ID (Academic Bank of Credits)",
+      "placeholder": "12-digit ABC ID or N/A"
     },
     "presentAddress": {
       "label": "Present Address",
-      "placeholder": ""
+      "placeholder": "House/Street, Village/City, District, State, Pincode"
     },
     "permanentAddress": {
       "label": "Permanent Address",
-      "placeholder": ""
+      "placeholder": "Permanent residential address"
     },
     "sameAddress": {
       "label": "Permanent Address same as Present Address",
@@ -97,30 +107,33 @@
     },
     "category": {
       "label": "Category",
-      "placeholder": "Select"
+      "placeholder": "Select Category",
+      "note": "Please Note: Keep a recent self-attested copy of the relevant certificate ready for admission verification."
     },
     "hostelRequired": {
-      "label": "Hostel Accommodation Required?",
+      "label": "Do you require hostel facility?",
       "placeholder": "Select"
     }
   },
   "academic_section": {
     "headers": [
-      "Exam/Degree Passed",
-      "School/College/Institute",
-      "Board/University",
+      "Exam / Degree Passed",
+      "School / College / Institute",
+      "Board / University",
       "Year of Passing",
       "Percentage (%)"
     ],
-    "add_btn": "Add Qualification",
+    "add_btn": "Add Another Qualification",
     "additional": {
-      "label": "Additional Academic/Professional Qualifications"
+      "label": "Additional Academic / Professional Qualifications (Optional)",
+      "placeholder": "List any diplomas, computer certifications, GIS training, etc."
     },
     "honors": {
-      "label": "Prizes, Honors, Scholarships received"
+      "label": "Prizes, Honors, Scholarships or Awards received",
+      "placeholder": "List any academic prizes, merit awards, scholarships received"
     },
     "languages": {
-      "title": "Language Proficiency",
+      "title": "Languages Known (Proficiency)",
       "speak": "Speak",
       "read": "Read",
       "write": "Write"
@@ -132,51 +145,62 @@
       "placeholder": "Select"
     },
     "orgName": {
-      "label": "Organization Name"
+      "label": "Organization Name & Address",
+      "placeholder": "Company / NGO / Institute name with city"
     },
     "designation": {
-      "label": "Designation"
+      "label": "Designation / Role",
+      "placeholder": "e.g. Field Officer, Researcher"
     },
     "period": {
-      "label": "Working Period"
+      "label": "Working Period",
+      "placeholder": "e.g. June 2024 - Present (1.5 Years)"
     },
     "reference": {
-      "label": "Reference"
+      "label": "Professional Reference",
+      "placeholder": "Name, Designation, Contact Number / Email of Supervisor"
     },
     "responsibility": {
-      "label": "Job Responsibility & Achievements"
+      "label": "Job Responsibilities & Key Achievements",
+      "placeholder": "Describe your daily roles, projects managed, and notable accomplishments"
     },
     "hobbies": {
-      "label": "Hobbies"
+      "label": "Hobbies & Interests",
+      "placeholder": "e.g. Reading, Trekking, Organic Gardening, Photography"
     },
-    "extracurriculars": {
-      "label": "Extracurricular Activities"
+    "extracurriculars_1": {
+      "label": "Extracurricular Activity 1",
+      "placeholder": "e.g. College NSS / NCC, Sports Team Captain, Environmental Club"
+    },
+    "extracurriculars_2": {
+      "label": "Extracurricular Activity 2",
+      "placeholder": "e.g. Debate, Youth Parliament, Community Volunteering"
     },
     "source": {
       "label": "How did you find out about this course?",
-      "placeholder": "Website, Friend, Social Media, etc."
+      "placeholder": "Select or type source"
     }
   },
   "statement_section": {
     "intent": {
-      "label": "Statement of Intent",
-      "note": "Please mention your desire to pursue this course."
+      "label": "Desire to Pursue this Course (Statement of Intent)",
+      "note": "Please articulate your motivation and passion for joining the M.A. in Natural Resource Management & Sustainable Development (Minimum 50 characters)."
     },
     "career": {
-      "label": "Career Intent",
-      "note": "How do you intend to utilize this course in your career?"
+      "label": "Career Utilization Intent",
+      "note": "How do you intend to utilize this degree and field training in your future career? (Minimum 50 characters)."
     },
     "declaration": {
-      "title": "Declaration",
+      "title": "Declaration by the Candidate",
       "text": "hereby declare that the information furnished in this Application Form is complete and true. I have also noted that I will be called for tests and/or personal interview based on the information provided therein, as above. I also agree that the institute has the right to cancel my candidature, if the institute finds that any information provided therein is incomplete, false or misleading or ineligibility being detected before or after the admission.",
-      "accept": "I accept the declaration"
+      "accept": "I accept and confirm the declaration above."
     },
-    "date": "Date",
-    "place": "Place"
+    "date": "Date of Submission",
+    "place": "Place / City"
   },
   "physical_apply": {
-    "title": "Applying with physical documents?",
-    "description": "You can also download the official application form as a DOCX file, fill it manually, and submit it at our campus.",
-    "cta": "Download Form"
+    "title": "Prefer applying with physical documents?",
+    "description": "You can download the official application form as a DOCX document, fill it out manually with your attached photo and certificates, and submit it directly at our campus.",
+    "cta": "Download DOCX Form"
   }
 }

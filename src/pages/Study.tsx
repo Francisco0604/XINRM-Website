@@ -1,13 +1,33 @@
-import React from 'react'
-import { BookOpen, Map, Microscope, GraduationCap, CheckCircle, Play, Users } from 'lucide-react'
+import React, { useState } from 'react'
+import { BookOpen, Map, Microscope, GraduationCap, CheckCircle, Play, Users, Camera, Download, ZoomIn, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import QuickLinks from '../components/QuickLinks'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import SoilProfile from '../components/SoilProfile'
 import studyData from '../data/study.json'
 
 const Study: React.FC = () => {
-  const { hero, sidebar, programme, curriculum, soil_science, facilities, support, scholarship } = studyData
+  const { hero, sidebar, programme, curriculum, soil_science, facilities, support, scholarship, activities } = studyData
+  const [activeTab, setActiveTab] = useState<string>('farewell-2026')
+  const [selectedImgIndex, setSelectedImgIndex] = useState<number>(-1)
+
+  const currentCategory = activities?.categories?.find((cat: any) => cat.id === activeTab)
+  const currentImages = currentCategory?.images || []
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedImgIndex < 0) return
+      if (e.key === 'ArrowLeft') {
+        setSelectedImgIndex((prev) => (prev === 0 ? currentImages.length - 1 : prev - 1))
+      } else if (e.key === 'ArrowRight') {
+        setSelectedImgIndex((prev) => (prev === currentImages.length - 1 ? 0 : prev + 1))
+      } else if (e.key === 'Escape') {
+        setSelectedImgIndex(-1)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedImgIndex, currentImages])
 
   return (
     <div>
@@ -100,6 +120,34 @@ const Study: React.FC = () => {
                       ))}
                     </tbody>
                   </table>
+                </div>
+
+                {/* Semester-wise Syllabus */}
+                <div className="mt-12 md:mt-16 space-y-6 md:space-y-8">
+                  <h3 className="text-xl md:text-2xl font-bold text-primary">Semester-wise Course Syllabus</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {curriculum.semesters?.map((sem: any, i: number) => (
+                      <div 
+                        key={i}
+                        className="glass-card card-padding rounded-3xl border border-gray-100 hover:border-accent/30 hover:shadow-lg transition-all duration-300 flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-50">
+                            <span className="text-accent text-sm font-bold uppercase tracking-widest">{sem.name}</span>
+                            <span className="text-[10px] bg-primary/5 text-primary px-3 py-1 rounded-full font-bold uppercase tracking-wider">{sem.courses.length} Courses</span>
+                          </div>
+                          <ul className="space-y-3">
+                            {sem.courses.map((course: string, idx: number) => (
+                              <li key={idx} className="flex items-start gap-3">
+                                <span className="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0"></span>
+                                <span className="text-gray-600 text-sm md:text-base leading-snug font-light">{course}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -194,6 +242,141 @@ const Study: React.FC = () => {
                       </div>
                    </div>
                 </div>
+              </div>
+
+              {/* Student Activities Section */}
+              <div id="activities" className="scroll-mt-32">
+                <div className="flex items-center gap-4 mb-10 md:mb-12">
+                  <div className="p-3 bg-accent/10 rounded-2xl shrink-0">
+                    <Camera className="text-accent" size={28} />
+                  </div>
+                  <h2 className="text-3xl md:text-5xl font-bold text-primary">{activities.title}</h2>
+                </div>
+                <p className="text-lg md:text-xl text-gray-600 leading-relaxed mb-10 md:mb-12 font-light">
+                  {activities.description}
+                </p>
+
+                {/* Category Tabs */}
+                <div className="flex flex-wrap gap-2 md:gap-3 mb-8 border-b border-gray-100 pb-6">
+                  {activities.categories.map((cat: any) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        setActiveTab(cat.id)
+                        setSelectedImgIndex(-1)
+                      }}
+                      className={`px-5 py-3 rounded-full text-[10px] md:text-xs font-bold transition-all uppercase tracking-wider cursor-pointer ${
+                        activeTab === cat.id
+                          ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                          : 'bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-primary'
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Category Details & Images */}
+                {currentCategory && (
+                  <div className="space-y-8">
+                    <div className="glass-card card-padding rounded-[2rem] bg-primary/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border border-gray-100">
+                      <div className="space-y-2 max-w-xl">
+                        <h4 className="font-bold text-xl md:text-2xl text-primary">{currentCategory.name}</h4>
+                        <p className="text-gray-500 text-sm md:text-base leading-relaxed font-light">{currentCategory.desc}</p>
+                      </div>
+                      
+                      {currentCategory.report_url && (
+                        <a
+                          href={currentCategory.report_url}
+                          download
+                          className="btn btn-accent flex items-center gap-2 px-6 py-3 text-xs md:text-sm shadow-md cursor-pointer shrink-0"
+                        >
+                          <Download size={16} /> Download Field Report
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Image Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+                      {currentImages.map((img: any, idx: number) => (
+                        <motion.div
+                          key={img.url}
+                          layoutId={`activity-gallery-${img.url}`}
+                          whileHover={{ scale: 1.03, zIndex: 10 }}
+                          onClick={() => setSelectedImgIndex(idx)}
+                          className="aspect-[4/3] rounded-2xl overflow-hidden shadow-sm relative group cursor-pointer border border-gray-100 bg-gray-50"
+                        >
+                          <img
+                            src={img.url}
+                            alt={img.caption}
+                            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-primary/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <ZoomIn className="text-white" size={28} />
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Lightbox for Student Activities */}
+                <AnimatePresence>
+                  {selectedImgIndex >= 0 && currentImages[selectedImgIndex] && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 z-[100] bg-primary/95 backdrop-blur-xl flex flex-col items-center justify-center p-6"
+                      onClick={() => setSelectedImgIndex(-1)}
+                    >
+                      <button
+                        className="absolute top-6 right-6 md:top-10 md:right-10 text-white/50 hover:text-white transition-colors cursor-pointer z-50"
+                        onClick={(e) => { e.stopPropagation(); setSelectedImgIndex(-1); }}
+                      >
+                        <X size={40} />
+                      </button>
+
+                      {/* Left Arrow */}
+                      <button
+                        className="absolute left-4 md:left-10 text-white/50 hover:text-white transition-colors cursor-pointer z-50 p-2 bg-black/20 hover:bg-black/40 rounded-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedImgIndex((prev) => (prev === 0 ? currentImages.length - 1 : prev - 1));
+                        }}
+                      >
+                        <ChevronLeft size={36} />
+                      </button>
+
+                      <motion.div
+                        layoutId={`activity-gallery-${currentImages[selectedImgIndex].url}`}
+                        className="max-w-5xl w-full aspect-[4/3] md:aspect-video rounded-3xl overflow-hidden shadow-2xl relative"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <img
+                          src={currentImages[selectedImgIndex].url}
+                          alt={currentImages[selectedImgIndex].caption}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
+                          <p className="text-white text-lg md:text-2xl font-bold italic tracking-wide">{currentImages[selectedImgIndex].caption}</p>
+                          <p className="text-gray-400 text-xs md:text-sm mt-1">{selectedImgIndex + 1} of {currentImages.length}</p>
+                        </div>
+                      </motion.div>
+
+                      {/* Right Arrow */}
+                      <button
+                        className="absolute right-4 md:right-10 text-white/50 hover:text-white transition-colors cursor-pointer z-50 p-2 bg-black/20 hover:bg-black/40 rounded-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedImgIndex((prev) => (prev === currentImages.length - 1 ? 0 : prev + 1));
+                        }}
+                      >
+                        <ChevronRight size={36} />
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>

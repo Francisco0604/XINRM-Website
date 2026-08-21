@@ -1,10 +1,11 @@
 import React from 'react'
-import { Calendar, Newspaper, Video, ArrowRight, Bell } from 'lucide-react'
+import { Calendar, Newspaper, ArrowRight, Bell } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import newsData from '../data/news.json'
 
 const News: React.FC = () => {
-  const { hero, notices, media, journal } = newsData
+  const { hero, notices, journal } = newsData
 
   return (
     <div>
@@ -50,48 +51,20 @@ const News: React.FC = () => {
                       className="flex flex-col md:flex-row gap-6 md:gap-10 glass-card p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] group transition-all"
                     >
                        <div className="bg-primary text-white p-6 md:p-8 rounded-2xl md:rounded-3xl text-center md:w-32 shrink-0 h-fit shadow-xl shadow-primary/10 flex md:flex-col items-center justify-center gap-2 md:gap-1">
-                          <span className="text-3xl md:text-4xl font-black">{notice.date.split(' ')[0]}</span>
-                          <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-accent">{notice.date.split(' ')[1]}</span>
+                          <span className="text-2xl md:text-3xl font-black uppercase tracking-tight">{notice.date.includes(' ') ? notice.date.split(' ')[0] : notice.date}</span>
+                          {notice.date.includes(' ') && (
+                             <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-accent">{notice.date.split(' ')[1]}</span>
+                          )}
                        </div>
                        <div className="space-y-4">
                           <h4 className="text-2xl md:text-3xl font-bold text-primary group-hover:text-accent transition-colors duration-500 leading-tight">{notice.title}</h4>
                           <p className="text-gray-500 text-base md:text-lg leading-relaxed font-light">{notice.desc}</p>
-                          <a href="#" className="inline-flex items-center gap-3 font-bold text-primary group-hover:gap-5 transition-all duration-500 text-sm">
+                          <Link to={notice.path || "#"} className="inline-flex items-center gap-3 font-bold text-primary group-hover:gap-5 transition-all duration-500 text-sm">
                              {notices.cta} <ArrowRight size={18} className="text-accent" />
-                          </a>
+                          </Link>
                        </div>
                     </motion.div>
                  ))}
-              </div>
-           </div>
-
-           <div className="mb-20 md:mb-32">
-              <div className="flex items-center gap-4 mb-10 md:mb-16">
-                 <div className="p-3 bg-accent/10 rounded-2xl shrink-0">
-                    <Newspaper className="text-accent" size={28} />
-                 </div>
-                 <h2 className="text-3xl md:text-5xl font-bold text-primary leading-tight">{media.title}</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-                 {media.items.map((item, i) => {
-                    const Icon = item.type === 'Article' ? Newspaper : Video
-                    return (
-                      <motion.div 
-                        key={i} 
-                        whileHover={{ y: -10 }}
-                        className="bg-gray-50 p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] border border-gray-100 group"
-                      >
-                        <Icon size={40} className="text-accent mb-6 md:mb-8 md:w-12 md:h-12" />
-                        <span className="text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-3 md:mb-4 block">{item.type}</span>
-                        <h4 className="text-xl md:text-2xl font-bold mb-4 text-primary leading-tight">{item.title}</h4>
-                        <p className="text-gray-600 text-base md:text-lg mb-8 leading-relaxed font-light">{item.desc}</p>
-                        <a href="#" className="btn btn-outline px-8 py-3 text-[10px] md:text-xs">
-                            {item.link_text}
-                        </a>
-                      </motion.div>
-                    )
-                 })}
               </div>
            </div>
 
