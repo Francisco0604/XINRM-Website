@@ -17,7 +17,10 @@ import {
   Download,
   AlertTriangle,
   FileCheck,
-  Image as ImageIcon
+  Image as ImageIcon,
+  CreditCard,
+  FileBadge,
+  FileSpreadsheet as FileListIcon
 } from 'lucide-react'
 import admissionData from '../data/admission.json'
 import { 
@@ -89,10 +92,14 @@ const Admission: React.FC = () => {
     extracurriculars_2: '',
     sourceOfInfo: '',
 
-    // Document Files
+    // Document File Names
     attachedPhotoName: '',
-    attachedDegreeName: '',
-    attachedCategoryName: '',
+    attachedPassingCertName: '',
+    attachedMarksheetName: '',
+    attachedAadharDocName: '',
+    attachedMigrationName: '',
+    attachedTransferCertName: '',
+    attachedPanDocName: '',
 
     // Step 4: Statement & Declaration
     statementOfIntent: '',
@@ -102,15 +109,23 @@ const Admission: React.FC = () => {
     place: ''
   })
 
-  // File Objects and Previews
+  // 7 Mandatory File Objects
   const [attachedFiles, setAttachedFiles] = useState<{
     photo: File | null
-    degree: File | null
-    categoryDoc: File | null
+    passingCertificate: File | null
+    marksheet: File | null
+    aadharCard: File | null
+    migrationCertificate: File | null
+    transferCertificate: File | null
+    panCard: File | null
   }>({
     photo: null,
-    degree: null,
-    categoryDoc: null
+    passingCertificate: null,
+    marksheet: null,
+    aadharCard: null,
+    migrationCertificate: null,
+    transferCertificate: null,
+    panCard: null
   })
 
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
@@ -161,28 +176,34 @@ const Admission: React.FC = () => {
     }))
   }
 
-  const handleFileChange = (docKey: 'photo' | 'degree' | 'categoryDoc', e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (docKey: keyof typeof attachedFiles, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null
     if (file) {
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setValidationError(`File ${file.name} exceeds 5MB limit. Please upload a smaller file.`)
+        setValidationError(`File ${file.name} exceeds the 5MB size limit. Please upload a smaller file.`)
         return
       }
 
       setAttachedFiles(prev => ({ ...prev, [docKey]: file }))
 
+      const fieldNameMap: Record<string, string> = {
+        photo: 'attachedPhotoName',
+        passingCertificate: 'attachedPassingCertName',
+        marksheet: 'attachedMarksheetName',
+        aadharCard: 'attachedAadharDocName',
+        migrationCertificate: 'attachedMigrationName',
+        transferCertificate: 'attachedTransferCertName',
+        panCard: 'attachedPanDocName'
+      }
+
+      setFormData((prev: any) => ({ ...prev, [fieldNameMap[docKey]]: file.name }))
+
       if (docKey === 'photo') {
-        setFormData((prev: any) => ({ ...prev, attachedPhotoName: file.name }))
         const reader = new FileReader()
         reader.onloadend = () => {
           setPhotoPreview(reader.result as string)
         }
         reader.readAsDataURL(file)
-      } else if (docKey === 'degree') {
-        setFormData((prev: any) => ({ ...prev, attachedDegreeName: file.name }))
-      } else if (docKey === 'categoryDoc') {
-        setFormData((prev: any) => ({ ...prev, attachedCategoryName: file.name }))
       }
     }
   }
@@ -293,6 +314,29 @@ const Admission: React.FC = () => {
           return { valid: false, error: 'Working Period is required when employed.' }
         }
       }
+
+      // Validate all 7 Mandatory Documents
+      if (!attachedFiles.photo) {
+        return { valid: false, error: 'Passport Size Photograph is mandatory. Please upload your photo.' }
+      }
+      if (!attachedFiles.passingCertificate) {
+        return { valid: false, error: 'Passing Certificate is mandatory. Please upload your passing certificate.' }
+      }
+      if (!attachedFiles.marksheet) {
+        return { valid: false, error: 'Marksheet is mandatory. Please upload your graduation / final marksheet.' }
+      }
+      if (!attachedFiles.aadharCard) {
+        return { valid: false, error: 'Aadhar Card is mandatory. Please upload your Aadhaar card copy.' }
+      }
+      if (!attachedFiles.migrationCertificate) {
+        return { valid: false, error: 'Migration Certificate is mandatory. Please upload your migration certificate.' }
+      }
+      if (!attachedFiles.transferCertificate) {
+        return { valid: false, error: 'Transfer Certificate (TC) is mandatory. Please upload your transfer certificate.' }
+      }
+      if (!attachedFiles.panCard) {
+        return { valid: false, error: 'PAN Card is mandatory. Please upload your PAN card copy.' }
+      }
     }
     
     return { valid: true, error: null }
@@ -351,6 +395,12 @@ const Admission: React.FC = () => {
       return
     }
 
+    // Double check documents before final submit
+    if (!attachedFiles.photo || !attachedFiles.passingCertificate || !attachedFiles.marksheet || !attachedFiles.aadharCard || !attachedFiles.migrationCertificate || !attachedFiles.transferCertificate || !attachedFiles.panCard) {
+      setValidationError('All 7 mandatory admission documents must be attached before submitting.')
+      return
+    }
+
     setIsSubmitting(true)
     const newRefId = generateReferenceId()
     setRefId(newRefId)
@@ -373,61 +423,69 @@ const Admission: React.FC = () => {
 
     // Build standard multi-part FormData for reliable file and field submission
     const submissionBody = new FormData()
-    submissionBody.append("access_key", "0c11516f-d748-43bb-bb85-021c4355ec6b")
-    submissionBody.append("subject", `🎓 New XINRM M.A. Application: ${fullName} [${newRefId}]`)
-    submissionBody.append("from_name", "XINRM Admissions Portal")
-    submissionBody.append("to", "xinrmsocialcentre50@gmail.com")
-    submissionBody.append("form-name", "admission")
-    submissionBody.append("applicationRefId", newRefId)
-    submissionBody.append("fullName", fullName)
-    submissionBody.append("salutation", sanitizeInput(formData.salutation))
-    submissionBody.append("name", cleanName)
-    submissionBody.append("surname", cleanSurname)
-    submissionBody.append("fatherName", sanitizeInput(formData.fatherName))
-    submissionBody.append("motherName", sanitizeInput(formData.motherName))
-    submissionBody.append("dob", sanitizeInput(formData.dob))
-    submissionBody.append("age", sanitizeInput(formData.age))
-    submissionBody.append("sex", sanitizeInput(formData.sex))
-    submissionBody.append("maritalStatus", sanitizeInput(formData.maritalStatus))
-    submissionBody.append("nationality", sanitizeInput(formData.nationality))
-    submissionBody.append("email", sanitizeInput(formData.email))
-    submissionBody.append("contactNumber", sanitizeInput(formData.contactNumber))
-    submissionBody.append("aadharNo", sanitizeInput(formData.aadharNo))
-    submissionBody.append("abcId", sanitizeInput(formData.abcId) || 'N/A')
-    submissionBody.append("category", sanitizeInput(formData.category))
-    submissionBody.append("hostelRequired", sanitizeInput(formData.hostelRequired))
-    submissionBody.append("presentAddress", sanitizeInput(formData.presentAddress))
-    submissionBody.append("permanentAddress", sanitizeInput(formData.permanentAddress))
-    submissionBody.append("qualifications", qualsText)
-    submissionBody.append("additionalQualification", sanitizeInput(formData.additionalQualification) || 'None')
-    submissionBody.append("honors", sanitizeInput(formData.honors) || 'None')
-    submissionBody.append("languages", langText || 'None specified')
-    submissionBody.append("isEmployed", sanitizeInput(formData.isEmployed))
+    submissionBody.append("_subject", `🎓 NEW M.A. ADMISSION APPLICATION: ${fullName} [${newRefId}]`)
+    submissionBody.append("Application_Reference_ID", newRefId)
+    submissionBody.append("Full_Name", fullName)
+    submissionBody.append("Salutation", sanitizeInput(formData.salutation))
+    submissionBody.append("First_Name", cleanName)
+    submissionBody.append("Surname", cleanSurname)
+    submissionBody.append("Father_Name", sanitizeInput(formData.fatherName))
+    submissionBody.append("Mother_Name", sanitizeInput(formData.motherName))
+    submissionBody.append("Date_of_Birth", sanitizeInput(formData.dob))
+    submissionBody.append("Age", `${sanitizeInput(formData.age)} Years`)
+    submissionBody.append("Gender", sanitizeInput(formData.sex))
+    submissionBody.append("Marital_Status", sanitizeInput(formData.maritalStatus))
+    submissionBody.append("Nationality", sanitizeInput(formData.nationality))
+    submissionBody.append("Contact_Number", sanitizeInput(formData.contactNumber))
+    submissionBody.append("Email_Address", sanitizeInput(formData.email))
+    submissionBody.append("Aadhaar_Number", sanitizeInput(formData.aadharNo))
+    submissionBody.append("ABC_ID", sanitizeInput(formData.abcId) || 'N/A')
+    submissionBody.append("Category", sanitizeInput(formData.category))
+    submissionBody.append("Hostel_Required", sanitizeInput(formData.hostelRequired))
+    submissionBody.append("Present_Address", sanitizeInput(formData.presentAddress))
+    submissionBody.append("Permanent_Address", sanitizeInput(formData.permanentAddress))
+    submissionBody.append("Academic_Qualifications", qualsText)
+    submissionBody.append("Additional_Qualifications", sanitizeInput(formData.additionalQualification) || 'None')
+    submissionBody.append("Honors_and_Scholarships", sanitizeInput(formData.honors) || 'None')
+    submissionBody.append("Languages_Known", langText || 'None specified')
+    submissionBody.append("Employment_Status", sanitizeInput(formData.isEmployed))
     
     if (formData.isEmployed === 'Yes') {
-      submissionBody.append("employmentDetails", `Organization: ${sanitizeInput(formData.employmentDetails.orgName)} | Designation: ${sanitizeInput(formData.employmentDetails.designation)} | Period: ${sanitizeInput(formData.employmentDetails.period)} | Ref: ${sanitizeInput(formData.employmentDetails.reference)} | Roles: ${sanitizeInput(formData.employmentDetails.responsibility)}`)
+      submissionBody.append("Employment_Details", `Organization: ${sanitizeInput(formData.employmentDetails.orgName)} | Designation: ${sanitizeInput(formData.employmentDetails.designation)} | Period: ${sanitizeInput(formData.employmentDetails.period)} | Ref: ${sanitizeInput(formData.employmentDetails.reference)} | Roles: ${sanitizeInput(formData.employmentDetails.responsibility)}`)
     } else {
-      submissionBody.append("employmentDetails", "Not Employed")
+      submissionBody.append("Employment_Details", "Not Employed")
     }
 
-    submissionBody.append("hobbies", sanitizeInput(formData.hobbies) || 'None')
-    submissionBody.append("extracurriculars", `1. ${sanitizeInput(formData.extracurriculars_1) || 'None'} | 2. ${sanitizeInput(formData.extracurriculars_2) || 'None'}`)
-    submissionBody.append("sourceOfInfo", sanitizeInput(formData.sourceOfInfo) || 'Website')
-    submissionBody.append("statementOfIntent", sanitizeInput(formData.statementOfIntent))
-    submissionBody.append("careerIntent", sanitizeInput(formData.careerIntent))
-    submissionBody.append("declarationAccepted", "YES (Confirmed by Applicant)")
-    submissionBody.append("date", sanitizeInput(formData.date))
-    submissionBody.append("place", sanitizeInput(formData.place))
+    submissionBody.append("Hobbies", sanitizeInput(formData.hobbies) || 'None')
+    submissionBody.append("Extracurricular_Activities", `1. ${sanitizeInput(formData.extracurriculars_1) || 'None'} | 2. ${sanitizeInput(formData.extracurriculars_2) || 'None'}`)
+    submissionBody.append("Source_of_Information", sanitizeInput(formData.sourceOfInfo) || 'Website')
+    submissionBody.append("Statement_of_Intent", sanitizeInput(formData.statementOfIntent))
+    submissionBody.append("Career_Intent", sanitizeInput(formData.careerIntent))
+    submissionBody.append("Declaration_Status", "ACCEPTED & DIGITALLY SIGNED BY APPLICANT")
+    submissionBody.append("Submission_Date", sanitizeInput(formData.date))
+    submissionBody.append("Submission_Place", sanitizeInput(formData.place))
 
-    // Attach documents if provided
+    // FormSubmit processes files when appended with key 'attachment'
     if (attachedFiles.photo) {
-      submissionBody.append("attachment_photo", attachedFiles.photo, attachedFiles.photo.name)
+      submissionBody.append("attachment", attachedFiles.photo, `1_photo_${attachedFiles.photo.name}`)
     }
-    if (attachedFiles.degree) {
-      submissionBody.append("attachment_degree", attachedFiles.degree, attachedFiles.degree.name)
+    if (attachedFiles.passingCertificate) {
+      submissionBody.append("attachment", attachedFiles.passingCertificate, `2_passing_cert_${attachedFiles.passingCertificate.name}`)
     }
-    if (attachedFiles.categoryDoc) {
-      submissionBody.append("attachment_categoryDoc", attachedFiles.categoryDoc, attachedFiles.categoryDoc.name)
+    if (attachedFiles.marksheet) {
+      submissionBody.append("attachment", attachedFiles.marksheet, `3_marksheet_${attachedFiles.marksheet.name}`)
+    }
+    if (attachedFiles.aadharCard) {
+      submissionBody.append("attachment", attachedFiles.aadharCard, `4_aadhar_${attachedFiles.aadharCard.name}`)
+    }
+    if (attachedFiles.migrationCertificate) {
+      submissionBody.append("attachment", attachedFiles.migrationCertificate, `5_migration_${attachedFiles.migrationCertificate.name}`)
+    }
+    if (attachedFiles.transferCertificate) {
+      submissionBody.append("attachment", attachedFiles.transferCertificate, `6_tc_${attachedFiles.transferCertificate.name}`)
+    }
+    if (attachedFiles.panCard) {
+      submissionBody.append("attachment", attachedFiles.panCard, `7_pan_${attachedFiles.panCard.name}`)
     }
 
     try {
@@ -440,16 +498,7 @@ const Admission: React.FC = () => {
         return null
       })
 
-      // 2. Dispatch to Web3Forms direct email delivery
-      const emailPromise = fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        body: submissionBody
-      }).catch(err => {
-        console.warn('Web3Forms dispatch note:', err)
-        return null
-      })
-
-      // 3. Dispatch to Netlify Serverless Function
+      // 2. Dispatch to Netlify Serverless Function
       const functionPromise = fetch("/.netlify/functions/submit-admission", {
         method: "POST",
         body: submissionBody
@@ -458,7 +507,7 @@ const Admission: React.FC = () => {
         return null
       })
 
-      // 4. Dispatch to Netlify Form detection endpoint
+      // 3. Dispatch to Netlify Form detection endpoint
       const netlifyPromise = fetch("/", {
         method: "POST",
         body: submissionBody
@@ -467,7 +516,7 @@ const Admission: React.FC = () => {
         return null
       })
 
-      await Promise.allSettled([formSubmitPromise, emailPromise, functionPromise, netlifyPromise])
+      await Promise.allSettled([formSubmitPromise, functionPromise, netlifyPromise])
 
       setIsSubmitted(true)
       window.scrollTo(0, 0)
@@ -543,7 +592,7 @@ const Admission: React.FC = () => {
             <div className="border-b border-gray-200 pb-4 flex justify-between items-start">
               <div>
                 <h3 className="font-bold text-lg text-primary">Social Centre's Xavier Institute of Natural Resource Management</h3>
-                <p className="text-xs text-gray-500">M.A. in Natural Resource Management and Sustainable Development | Application Dossier</p>
+                <p className="text-xs text-gray-500">M.A. in Natural Resource Management and Sustainable Development | Official Application Slip</p>
                 <p className="text-xs text-accent font-bold mt-1">Application Reference: {refId}</p>
               </div>
               <div className="flex gap-4 items-center">
@@ -614,14 +663,40 @@ const Admission: React.FC = () => {
               </div>
             </div>
 
-            {(formData.attachedPhotoName || formData.attachedDegreeName || formData.attachedCategoryName) && (
-              <div className="pt-2">
-                <span className="font-bold text-gray-400 text-xs block uppercase mb-1">Attached Digital Documents</span>
-                <p className="text-xs text-gray-600">
-                  {[formData.attachedPhotoName && `Photo: ${formData.attachedPhotoName}`, formData.attachedDegreeName && `Degree: ${formData.attachedDegreeName}`, formData.attachedCategoryName && `Category: ${formData.attachedCategoryName}`].filter(Boolean).join(' | ')}
-                </p>
+            {/* 7 Mandatory Documents Status Badge */}
+            <div className="pt-2">
+              <span className="font-bold text-gray-400 text-xs block uppercase mb-2">Attached Mandatory Documents (7 of 7 Verified)</span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                <div className="bg-white p-2 rounded-lg border border-gray-200">
+                  <span className="text-gray-400 block">1. Photo</span>
+                  <span className="font-bold text-emerald-700 truncate block">✓ {formData.attachedPhotoName}</span>
+                </div>
+                <div className="bg-white p-2 rounded-lg border border-gray-200">
+                  <span className="text-gray-400 block">2. Passing Cert</span>
+                  <span className="font-bold text-emerald-700 truncate block">✓ {formData.attachedPassingCertName}</span>
+                </div>
+                <div className="bg-white p-2 rounded-lg border border-gray-200">
+                  <span className="text-gray-400 block">3. Marksheet</span>
+                  <span className="font-bold text-emerald-700 truncate block">✓ {formData.attachedMarksheetName}</span>
+                </div>
+                <div className="bg-white p-2 rounded-lg border border-gray-200">
+                  <span className="text-gray-400 block">4. Aadhar Card</span>
+                  <span className="font-bold text-emerald-700 truncate block">✓ {formData.attachedAadharDocName}</span>
+                </div>
+                <div className="bg-white p-2 rounded-lg border border-gray-200">
+                  <span className="text-gray-400 block">5. Migration Cert</span>
+                  <span className="font-bold text-emerald-700 truncate block">✓ {formData.attachedMigrationName}</span>
+                </div>
+                <div className="bg-white p-2 rounded-lg border border-gray-200">
+                  <span className="text-gray-400 block">6. Transfer Cert</span>
+                  <span className="font-bold text-emerald-700 truncate block">✓ {formData.attachedTransferCertName}</span>
+                </div>
+                <div className="bg-white p-2 rounded-lg border border-gray-200">
+                  <span className="text-gray-400 block">7. PAN Card</span>
+                  <span className="font-bold text-emerald-700 truncate block">✓ {formData.attachedPanDocName}</span>
+                </div>
               </div>
-            )}
+            </div>
 
             <div className="border-t border-gray-200 pt-4 flex justify-between items-center text-xs text-gray-500">
               <span>Declaration Verified: <strong className="text-emerald-700">Agreed & Digital Signed</strong></span>
@@ -1027,7 +1102,7 @@ const Admission: React.FC = () => {
                 </motion.div>
               )}
 
-              {/* STEP 3: EMPLOYMENT, EXTRACURRICULARS & DOCUMENTS */}
+              {/* STEP 3: EMPLOYMENT & 7 MANDATORY DOCUMENT ATTACHMENTS */}
               {step === 3 && (
                 <motion.div 
                   key="step3"
@@ -1042,7 +1117,7 @@ const Admission: React.FC = () => {
                     </div>
                     <div>
                       <h2 className="text-2xl md:text-3xl font-bold text-primary">{sections.experience}</h2>
-                      <p className="text-xs text-gray-400">Professional background, activities, and digital document uploads</p>
+                      <p className="text-xs text-gray-400">Professional record, extracurriculars, and mandatory document verification</p>
                     </div>
                   </div>
 
@@ -1119,76 +1194,165 @@ const Admission: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* DIGITAL DOCUMENT ATTACHMENTS (OPTIONAL) */}
-                  <div className="space-y-6 pt-4 border-t border-gray-100">
+                  {/* 7 MANDATORY DOCUMENT UPLOADS */}
+                  <div className="space-y-6 pt-6 border-t-2 border-primary/10">
                     <div>
-                      <h3 className="font-bold text-primary uppercase tracking-widest text-xs flex items-center gap-2">
-                        <Upload size={16} className="text-accent" />
+                      <h3 className="font-bold text-primary uppercase tracking-widest text-sm flex items-center gap-2">
+                        <Upload size={18} className="text-accent" />
                         {documents_section.title}
                       </h3>
-                      <p className="text-xs text-gray-400 mt-1">{documents_section.description}</p>
+                      <p className="text-xs text-gray-500 mt-1">{documents_section.description}</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      {/* Photo Upload */}
-                      <div className="border-2 border-dashed border-gray-200 rounded-3xl p-6 text-center hover:border-primary transition-colors bg-gray-50/50">
-                        <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center mx-auto mb-3 text-primary">
-                          <ImageIcon size={24} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      
+                      {/* 1. Passport Photo */}
+                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.photo ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
+                          <ImageIcon size={20} />
                         </div>
-                        <label className="text-xs font-bold text-gray-700 block mb-1">{documents_section.photo.label}</label>
+                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.photo.label}</label>
                         <p className="text-[10px] text-gray-400 mb-3">{documents_section.photo.hint}</p>
                         <input 
                           type="file" 
                           accept="image/*" 
+                          required
                           onChange={(e) => handleFileChange('photo', e)} 
-                          className="text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
+                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
                         />
                         {attachedFiles.photo && (
-                          <div className="mt-2 text-emerald-600 text-xs font-bold flex items-center justify-center gap-1">
+                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
                             <FileCheck size={14} /> {attachedFiles.photo.name}
                           </div>
                         )}
                       </div>
 
-                      {/* Degree Upload */}
-                      <div className="border-2 border-dashed border-gray-200 rounded-3xl p-6 text-center hover:border-primary transition-colors bg-gray-50/50">
-                        <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center mx-auto mb-3 text-primary">
-                          <GraduationCap size={24} />
+                      {/* 2. Passing Certificate */}
+                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.passingCertificate ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
+                          <FileBadge size={20} />
                         </div>
-                        <label className="text-xs font-bold text-gray-700 block mb-1">{documents_section.degree.label}</label>
-                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.degree.hint}</p>
+                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.passingCertificate.label}</label>
+                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.passingCertificate.hint}</p>
                         <input 
                           type="file" 
                           accept="application/pdf,image/*" 
-                          onChange={(e) => handleFileChange('degree', e)} 
-                          className="text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
+                          required
+                          onChange={(e) => handleFileChange('passingCertificate', e)} 
+                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
                         />
-                        {attachedFiles.degree && (
-                          <div className="mt-2 text-emerald-600 text-xs font-bold flex items-center justify-center gap-1">
-                            <FileCheck size={14} /> {attachedFiles.degree.name}
+                        {attachedFiles.passingCertificate && (
+                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
+                            <FileCheck size={14} /> {attachedFiles.passingCertificate.name}
                           </div>
                         )}
                       </div>
 
-                      {/* Category Certificate Upload */}
-                      <div className="border-2 border-dashed border-gray-200 rounded-3xl p-6 text-center hover:border-primary transition-colors bg-gray-50/50">
-                        <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center mx-auto mb-3 text-primary">
-                          <FileText size={24} />
+                      {/* 3. Marksheet */}
+                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.marksheet ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
+                          <GraduationCap size={20} />
                         </div>
-                        <label className="text-xs font-bold text-gray-700 block mb-1">{documents_section.categoryDoc.label}</label>
-                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.categoryDoc.hint}</p>
+                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.marksheet.label}</label>
+                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.marksheet.hint}</p>
                         <input 
                           type="file" 
                           accept="application/pdf,image/*" 
-                          onChange={(e) => handleFileChange('categoryDoc', e)} 
-                          className="text-xs text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer"
+                          required
+                          onChange={(e) => handleFileChange('marksheet', e)} 
+                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
                         />
-                        {attachedFiles.categoryDoc && (
-                          <div className="mt-2 text-emerald-600 text-xs font-bold flex items-center justify-center gap-1">
-                            <FileCheck size={14} /> {attachedFiles.categoryDoc.name}
+                        {attachedFiles.marksheet && (
+                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
+                            <FileCheck size={14} /> {attachedFiles.marksheet.name}
                           </div>
                         )}
                       </div>
+
+                      {/* 4. Aadhar Card */}
+                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.aadharCard ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
+                          <CreditCard size={20} />
+                        </div>
+                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.aadharCard.label}</label>
+                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.aadharCard.hint}</p>
+                        <input 
+                          type="file" 
+                          accept="application/pdf,image/*" 
+                          required
+                          onChange={(e) => handleFileChange('aadharCard', e)} 
+                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
+                        />
+                        {attachedFiles.aadharCard && (
+                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
+                            <FileCheck size={14} /> {attachedFiles.aadharCard.name}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 5. Migration Certificate */}
+                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.migrationCertificate ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
+                          <FileText size={20} />
+                        </div>
+                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.migrationCertificate.label}</label>
+                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.migrationCertificate.hint}</p>
+                        <input 
+                          type="file" 
+                          accept="application/pdf,image/*" 
+                          required
+                          onChange={(e) => handleFileChange('migrationCertificate', e)} 
+                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
+                        />
+                        {attachedFiles.migrationCertificate && (
+                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
+                            <FileCheck size={14} /> {attachedFiles.migrationCertificate.name}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 6. Transfer Certificate (TC) */}
+                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.transferCertificate ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
+                          <FileListIcon size={20} />
+                        </div>
+                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.transferCertificate.label}</label>
+                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.transferCertificate.hint}</p>
+                        <input 
+                          type="file" 
+                          accept="application/pdf,image/*" 
+                          required
+                          onChange={(e) => handleFileChange('transferCertificate', e)} 
+                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
+                        />
+                        {attachedFiles.transferCertificate && (
+                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
+                            <FileCheck size={14} /> {attachedFiles.transferCertificate.name}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 7. PAN Card */}
+                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.panCard ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
+                          <CreditCard size={20} />
+                        </div>
+                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.panCard.label}</label>
+                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.panCard.hint}</p>
+                        <input 
+                          type="file" 
+                          accept="application/pdf,image/*" 
+                          required
+                          onChange={(e) => handleFileChange('panCard', e)} 
+                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
+                        />
+                        {attachedFiles.panCard && (
+                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
+                            <FileCheck size={14} /> {attachedFiles.panCard.name}
+                          </div>
+                        )}
+                      </div>
+
                     </div>
                   </div>
                 </motion.div>
@@ -1329,7 +1493,7 @@ const Admission: React.FC = () => {
                   disabled={!formData.declarationAccepted || isSubmitting}
                   className={`btn btn-accent flex items-center justify-center gap-2 px-12 py-5 text-base shadow-2xl shadow-accent/20 cursor-pointer ${(!formData.declarationAccepted || isSubmitting) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  {isSubmitting ? 'Recording Application...' : 'Submit Application'} <ArrowRight size={20} className="ml-2" />
+                  {isSubmitting ? 'Recording Application & Uploading Documents...' : 'Submit Application'} <ArrowRight size={20} className="ml-2" />
                 </button>
               )}
             </div>

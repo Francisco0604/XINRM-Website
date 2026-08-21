@@ -140,7 +140,24 @@ export function generateApplicationExcel(formData: any, refNumber: string): void
     wsExp['!cols'] = [{ wch: 35 }, { wch: 50 }]
     XLSX.utils.book_append_sheet(wb, wsExp, "3. Experience & Languages")
 
-    // Sheet 4: Statements & Statutory Declaration
+    // Sheet 4: Mandatory Document Upload Verification
+    const docRows = [
+      ["MANDATORY ADMISSION DOCUMENTS CHECKLIST"],
+      [],
+      ["#", "REQUIRED DOCUMENT", "ATTACHMENT STATUS", "FILE NAME"],
+      ["1", "Passport Size Photograph", formData.attachedPhotoName ? "ATTACHED" : "PENDING", formData.attachedPhotoName || "Not uploaded"],
+      ["2", "Passing Certificate", formData.attachedPassingCertName ? "ATTACHED" : "PENDING", formData.attachedPassingCertName || "Not uploaded"],
+      ["3", "Marksheet", formData.attachedMarksheetName ? "ATTACHED" : "PENDING", formData.attachedMarksheetName || "Not uploaded"],
+      ["4", "Aadhar Card (Self-Attested)", formData.attachedAadharDocName ? "ATTACHED" : "PENDING", formData.attachedAadharDocName || "Not uploaded"],
+      ["5", "Migration Certificate", formData.attachedMigrationName ? "ATTACHED" : "PENDING", formData.attachedMigrationName || "Not uploaded"],
+      ["6", "Transfer Certificate (TC)", formData.attachedTransferCertName ? "ATTACHED" : "PENDING", formData.attachedTransferCertName || "Not uploaded"],
+      ["7", "PAN Card", formData.attachedPanDocName ? "ATTACHED" : "PENDING", formData.attachedPanDocName || "Not uploaded"]
+    ]
+    const wsDocs = XLSX.utils.aoa_to_sheet(docRows)
+    wsDocs['!cols'] = [{ wch: 5 }, { wch: 35 }, { wch: 22 }, { wch: 45 }]
+    XLSX.utils.book_append_sheet(wb, wsDocs, "4. Documents Checklist")
+
+    // Sheet 5: Statements & Statutory Declaration
     const stmtRows = [
       ["STATEMENTS OF PURPOSE & LEGAL DECLARATION"],
       [],
@@ -156,7 +173,7 @@ export function generateApplicationExcel(formData: any, refNumber: string): void
     ]
     const wsStmt = XLSX.utils.aoa_to_sheet(stmtRows)
     wsStmt['!cols'] = [{ wch: 35 }, { wch: 75 }]
-    XLSX.utils.book_append_sheet(wb, wsStmt, "4. Statements & Undertaking")
+    XLSX.utils.book_append_sheet(wb, wsStmt, "5. Statements & Undertaking")
 
     // Export file
     const sanitizedCandidateName = (formData.name || 'Candidate').replace(/[^a-zA-Z0-9]/g, '_')
