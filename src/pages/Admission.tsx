@@ -440,7 +440,16 @@ const Admission: React.FC = () => {
         return null
       })
 
-      // 2. Dispatch to Netlify Form endpoint
+      // 2. Dispatch to Netlify Serverless Function
+      const functionPromise = fetch("/.netlify/functions/submit-admission", {
+        method: "POST",
+        body: submissionBody
+      }).catch(err => {
+        console.warn('Netlify function dispatch note:', err)
+        return null
+      })
+
+      // 3. Dispatch to Netlify Form detection endpoint
       const netlifyPromise = fetch("/", {
         method: "POST",
         body: submissionBody
@@ -449,7 +458,7 @@ const Admission: React.FC = () => {
         return null
       })
 
-      await Promise.allSettled([emailPromise, netlifyPromise])
+      await Promise.allSettled([emailPromise, functionPromise, netlifyPromise])
 
       setIsSubmitted(true)
       window.scrollTo(0, 0)
