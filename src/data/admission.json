@@ -3,11 +3,11 @@
     "badge": "Admissions 2026-2027",
     "title": "Application Form",
     "affiliation": "Social Centre's Xavier Institute of Natural Resource Management (Recognized by Savitribai Phule Pune University)",
-    "description": "Join the next generation of leaders in Natural Resource Management and Sustainable Development. Please fill out all required details and upload mandatory documents."
+    "description": "Join the next generation of leaders in Natural Resource Management and Sustainable Development. Please fill out all required details and upload all mandatory documents."
   },
   "success": {
     "title": "Application Submitted Successfully!",
-    "description": "Thank you for applying to the MA in Natural Resource Management and Sustainable Development. Your application dossier and attached documents have been submitted to the admissions cell at xinrmsocialcentre50@gmail.com. You can download your official application spreadsheet or print your signed summary below.",
+    "description": "Thank you for applying to the MA in Natural Resource Management and Sustainable Development. Your application dossier and all attached documents have been submitted to the admissions cell at xinrmsocialcentre50@gmail.com. You can download your official application spreadsheet or print your signed summary below.",
     "cta_home": "Back to Home",
     "cta_print": "Print / Save Application (PDF)",
     "cta_excel": "Download Spreadsheet (.xlsx)"
@@ -15,7 +15,7 @@
   "steps": [
     {
       "id": 1,
-      "title": "Personal"
+      "title": "Personal & Photo"
     },
     {
       "id": 2,
@@ -23,18 +23,23 @@
     },
     {
       "id": 3,
-      "title": "Experience & Docs"
+      "title": "Experience"
     },
     {
       "id": 4,
-      "title": "Statement"
+      "title": "Mandatory Docs"
+    },
+    {
+      "id": 5,
+      "title": "Declaration"
     }
   ],
   "sections": {
-    "personal": "Personal Information",
+    "personal": "Personal Information & Passport Photo",
     "academic": "Academic Qualifications & Languages",
-    "experience": "Employment, Activities & Mandatory Documents",
-    "statement": "Statement of Intent & Declaration"
+    "experience": "Employment Record & Extracurriculars",
+    "documents": "Mandatory Document & Certificate Uploads",
+    "statement": "Statement of Intent & Legal Declaration"
   },
   "fields": {
     "salutation": {
@@ -182,35 +187,35 @@
     }
   },
   "documents_section": {
-    "title": "Mandatory Document Uploads (Required for Admission)",
-    "description": "All applicants must upload legible, self-attested digital copies of the 7 mandatory documents below (Max 5MB each, PDF or Image).",
+    "title": "Mandatory Document & Image Uploads",
+    "description": "Please upload clear, legible digital copies (JPG, PNG, or PDF format, max 5MB each). All 7 documents are compulsory for admission processing.",
     "photo": {
       "label": "1. Passport Size Photograph *",
-      "hint": "Recent passport photo with clear face view (JPG/PNG)"
+      "hint": "Recent color passport photo (JPG/PNG format, max 5MB)"
     },
     "passingCertificate": {
       "label": "2. Passing Certificate *",
-      "hint": "Graduation / Qualifying Degree Passing Certificate (PDF/JPG)"
+      "hint": "Graduation / Qualifying Degree Passing Certificate (PDF/JPG/PNG)"
     },
     "marksheet": {
       "label": "3. Marksheet *",
-      "hint": "Final Year / Consolidated Graduation Marksheet (PDF/JPG)"
+      "hint": "Final Year / Consolidated Graduation Marksheet (PDF/JPG/PNG)"
     },
     "aadharCard": {
       "label": "4. Aadhar Card *",
-      "hint": "Self-attested copy of Aadhaar Card (PDF/JPG)"
+      "hint": "Self-attested copy of Aadhaar Card (PDF/JPG/PNG)"
     },
     "migrationCertificate": {
       "label": "5. Migration Certificate *",
-      "hint": "Official University Migration Certificate (PDF/JPG)"
+      "hint": "Official University Migration Certificate (PDF/JPG/PNG)"
     },
     "transferCertificate": {
       "label": "6. Transfer Certificate (TC) *",
-      "hint": "College Leaving / Transfer Certificate (PDF/JPG)"
+      "hint": "College Leaving / Transfer Certificate (PDF/JPG/PNG)"
     },
     "panCard": {
       "label": "7. PAN Card *",
-      "hint": "Self-attested PAN Card copy (PDF/JPG)"
+      "hint": "Self-attested copy of PAN Card (PDF/JPG/PNG)"
     }
   },
   "statement_section": {

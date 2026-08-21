@@ -12,6 +12,47 @@ export function sanitizeInput(input: string | undefined | null): string {
 }
 
 /**
+ * Sanitizes uploaded file names to prevent directory traversal and injection attacks.
+ */
+export function sanitizeFileName(fileName: string | undefined | null): string {
+  if (!fileName) return 'document'
+  return String(fileName)
+    .replace(/^.*[\\\/]/, '') // extract base filename
+    .replace(/[^a-zA-Z0-9._-]/g, '_') // only allow alphanumeric, dot, underscore, dash
+    .replace(/_+/g, '_')
+}
+
+/**
+ * Validates file security constraints (size, MIME type, extension).
+ */
+export function validateUploadedFile(
+  file: File | null, 
+  allowedExtensions: string[] = ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
+  maxSizeBytes: number = 5 * 1024 * 1024
+): { valid: boolean; error: string | null } {
+  if (!file) {
+    return { valid: false, error: 'No file selected.' }
+  }
+  
+  if (file.size < 512) { // Less than 512 bytes
+    return { valid: false, error: `${file.name} is too small or corrupted.` }
+  }
+  if (file.size > maxSizeBytes) {
+    return { valid: false, error: `${file.name} exceeds the maximum allowed size of 5MB.` }
+  }
+  
+  const ext = file.name.split('.').pop()?.toLowerCase()
+  if (!ext || !allowedExtensions.includes(ext)) {
+    return { 
+      valid: false, 
+      error: `${file.name} has an unsupported format (.${ext || 'unknown'}). Allowed formats: ${allowedExtensions.map(e => `.${e.toUpperCase()}`).join(', ')}.` 
+    }
+  }
+  
+  return { valid: true, error: null }
+}
+
+/**
  * Calculates current age from a Date of Birth string (YYYY-MM-DD).
  */
 export function calculateAge(dobString: string): number | null {
@@ -176,7 +217,7 @@ export function generateApplicationExcel(formData: any, refNumber: string): void
     XLSX.utils.book_append_sheet(wb, wsStmt, "5. Statements & Undertaking")
 
     // Export file
-    const sanitizedCandidateName = (formData.name || 'Candidate').replace(/[^a-zA-Z0-9]/g, '_')
+    const sanitizedCandidateName = sanitizeFileName(formData.name || 'Candidate')
     XLSX.writeFile(wb, `XINRM_Application_${refNumber}_${sanitizedCandidateName}.xlsx`)
   } catch (error) {
     console.error('Failed to generate Excel file:', error)

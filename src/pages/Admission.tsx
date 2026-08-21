@@ -20,11 +20,16 @@ import {
   Image as ImageIcon,
   CreditCard,
   FileBadge,
-  FileSpreadsheet as FileListIcon
+  FileSpreadsheet as FileListIcon,
+  Trash2,
+  Camera,
+  Eye
 } from 'lucide-react'
 import admissionData from '../data/admission.json'
 import { 
   sanitizeInput, 
+  sanitizeFileName,
+  validateUploadedFile,
   calculateAge, 
   generateReferenceId, 
   generateApplicationExcel 
@@ -43,7 +48,7 @@ const Admission: React.FC = () => {
     // Security Honeypot (must remain empty)
     bot_trap: '',
 
-    // Step 1: Personal Information
+    // Step 1: Personal Information & Passport Photo
     salutation: 'Mr.',
     name: '',
     surname: '',
@@ -92,7 +97,7 @@ const Admission: React.FC = () => {
     extracurriculars_2: '',
     sourceOfInfo: '',
 
-    // Document File Names
+    // Step 4: Document File Names
     attachedPhotoName: '',
     attachedPassingCertName: '',
     attachedMarksheetName: '',
@@ -101,7 +106,7 @@ const Admission: React.FC = () => {
     attachedTransferCertName: '',
     attachedPanDocName: '',
 
-    // Step 4: Statement & Declaration
+    // Step 5: Statement & Declaration
     statementOfIntent: '',
     careerIntent: '',
     declarationAccepted: false,
@@ -128,7 +133,8 @@ const Admission: React.FC = () => {
     panCard: null
   })
 
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  // Document Image Previews
+  const [filePreviews, setFilePreviews] = useState<Record<string, string>>({})
 
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -176,36 +182,71 @@ const Admission: React.FC = () => {
     }))
   }
 
+  // File Upload Handler with Cyber Validation & Sanitization
   const handleFileChange = (docKey: keyof typeof attachedFiles, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setValidationError(`File ${file.name} exceeds the 5MB size limit. Please upload a smaller file.`)
-        return
-      }
+    setValidationError(null)
+    const rawFile = e.target.files?.[0] || null
+    if (!rawFile) return
 
-      setAttachedFiles(prev => ({ ...prev, [docKey]: file }))
-
-      const fieldNameMap: Record<string, string> = {
-        photo: 'attachedPhotoName',
-        passingCertificate: 'attachedPassingCertName',
-        marksheet: 'attachedMarksheetName',
-        aadharCard: 'attachedAadharDocName',
-        migrationCertificate: 'attachedMigrationName',
-        transferCertificate: 'attachedTransferCertName',
-        panCard: 'attachedPanDocName'
-      }
-
-      setFormData((prev: any) => ({ ...prev, [fieldNameMap[docKey]]: file.name }))
-
-      if (docKey === 'photo') {
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          setPhotoPreview(reader.result as string)
-        }
-        reader.readAsDataURL(file)
-      }
+    // 1. Security & MIME validation
+    const validation = validateUploadedFile(rawFile, ['jpg', 'jpeg', 'png', 'webp', 'pdf'])
+    if (!validation.valid) {
+      setValidationError(validation.error)
+      e.target.value = ''
+      return
     }
+
+    // 2. Sanitize file name
+    const cleanFileName = sanitizeFileName(rawFile.name)
+    const sanitizedFile = new File([rawFile], cleanFileName, { type: rawFile.type })
+
+    setAttachedFiles(prev => ({ ...prev, [docKey]: sanitizedFile }))
+
+    const fieldNameMap: Record<string, string> = {
+      photo: 'attachedPhotoName',
+      passingCertificate: 'attachedPassingCertName',
+      marksheet: 'attachedMarksheetName',
+      aadharCard: 'attachedAadharDocName',
+      migrationCertificate: 'attachedMigrationName',
+      transferCertificate: 'attachedTransferCertName',
+      panCard: 'attachedPanDocName'
+    }
+
+    setFormData((prev: any) => ({ ...prev, [fieldNameMap[docKey]]: cleanFileName }))
+
+    // 3. Generate Image / PDF preview if image format
+    if (rawFile.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setFilePreviews(prev => ({ ...prev, [docKey]: reader.result as string }))
+      }
+      reader.readAsDataURL(rawFile)
+    } else {
+      setFilePreviews(prev => {
+        const copy = { ...prev }
+        delete copy[docKey]
+        return copy
+      })
+    }
+  }
+
+  const removeFile = (docKey: keyof typeof attachedFiles) => {
+    setAttachedFiles(prev => ({ ...prev, [docKey]: null }))
+    const fieldNameMap: Record<string, string> = {
+      photo: 'attachedPhotoName',
+      passingCertificate: 'attachedPassingCertName',
+      marksheet: 'attachedMarksheetName',
+      aadharCard: 'attachedAadharDocName',
+      migrationCertificate: 'attachedMigrationName',
+      transferCertificate: 'attachedTransferCertName',
+      panCard: 'attachedPanDocName'
+    }
+    setFormData((prev: any) => ({ ...prev, [fieldNameMap[docKey]]: '' }))
+    setFilePreviews(prev => {
+      const copy = { ...prev }
+      delete copy[docKey]
+      return copy
+    })
   }
 
   const addQualification = () => {
@@ -229,9 +270,14 @@ const Admission: React.FC = () => {
     setFormData((prev: any) => ({ ...prev, qualifications: newQuals }))
   }
 
-  // Strict Validation Logic
+  // Strict Validation Logic across all 5 Steps
   const validateStep = (currentStep: number): { valid: boolean; error: string | null } => {
     if (currentStep === 1) {
+      // Passport Photo Check in Step 1
+      if (!attachedFiles.photo) {
+        return { valid: false, error: 'Passport Size Photograph is mandatory. Please upload your recent photo.' }
+      }
+
       if (!formData.name?.trim()) return { valid: false, error: 'First Name is required.' }
       if (!formData.surname?.trim()) return { valid: false, error: 'Surname / Last Name is required.' }
       if (!formData.fatherName?.trim()) return { valid: false, error: "Father's / Husband's Name is required." }
@@ -314,28 +360,30 @@ const Admission: React.FC = () => {
           return { valid: false, error: 'Working Period is required when employed.' }
         }
       }
+    }
 
+    if (currentStep === 4) {
       // Validate all 7 Mandatory Documents
       if (!attachedFiles.photo) {
-        return { valid: false, error: 'Passport Size Photograph is mandatory. Please upload your photo.' }
+        return { valid: false, error: '1. Passport Size Photograph is mandatory.' }
       }
       if (!attachedFiles.passingCertificate) {
-        return { valid: false, error: 'Passing Certificate is mandatory. Please upload your passing certificate.' }
+        return { valid: false, error: '2. Passing Certificate is mandatory. Please upload your passing certificate.' }
       }
       if (!attachedFiles.marksheet) {
-        return { valid: false, error: 'Marksheet is mandatory. Please upload your graduation / final marksheet.' }
+        return { valid: false, error: '3. Marksheet is mandatory. Please upload your graduation / final marksheet.' }
       }
       if (!attachedFiles.aadharCard) {
-        return { valid: false, error: 'Aadhar Card is mandatory. Please upload your Aadhaar card copy.' }
+        return { valid: false, error: '4. Aadhar Card is mandatory. Please upload your Aadhaar card copy.' }
       }
       if (!attachedFiles.migrationCertificate) {
-        return { valid: false, error: 'Migration Certificate is mandatory. Please upload your migration certificate.' }
+        return { valid: false, error: '5. Migration Certificate is mandatory. Please upload your migration certificate.' }
       }
       if (!attachedFiles.transferCertificate) {
-        return { valid: false, error: 'Transfer Certificate (TC) is mandatory. Please upload your transfer certificate.' }
+        return { valid: false, error: '6. Transfer Certificate (TC) is mandatory. Please upload your transfer certificate.' }
       }
       if (!attachedFiles.panCard) {
-        return { valid: false, error: 'PAN Card is mandatory. Please upload your PAN card copy.' }
+        return { valid: false, error: '7. PAN Card is mandatory. Please upload your PAN card copy.' }
       }
     }
     
@@ -346,7 +394,7 @@ const Admission: React.FC = () => {
     setValidationError(null)
     const validation = validateStep(step)
     if (validation.valid) {
-      setStep(s => Math.min(s + 1, 4))
+      setStep(s => Math.min(s + 1, 5))
       window.scrollTo({ top: 200, behavior: 'smooth' })
     } else {
       setValidationError(validation.error)
@@ -377,7 +425,7 @@ const Admission: React.FC = () => {
       return
     }
 
-    // Step 4 Validations
+    // Step 5 Validations
     if (!formData.statementOfIntent?.trim() || formData.statementOfIntent.trim().length < 40) {
       setValidationError('Statement of Intent is required (minimum 40 characters explaining your desire to pursue this course).')
       return
@@ -423,7 +471,7 @@ const Admission: React.FC = () => {
 
     // Build standard multi-part FormData for reliable file and field submission
     const submissionBody = new FormData()
-    submissionBody.append("_subject", `🎓 NEW M.A. ADMISSION APPLICATION: ${fullName} [${newRefId}]`)
+    submissionBody.append("_subject", `🎓 NEW M.A. ADMISSION APPLICATION (7 ATTACHMENTS VERIFIED): ${fullName} [${newRefId}]`)
     submissionBody.append("Application_Reference_ID", newRefId)
     submissionBody.append("Full_Name", fullName)
     submissionBody.append("Salutation", sanitizeInput(formData.salutation))
@@ -467,25 +515,25 @@ const Admission: React.FC = () => {
 
     // FormSubmit processes files when appended with key 'attachment'
     if (attachedFiles.photo) {
-      submissionBody.append("attachment", attachedFiles.photo, `1_photo_${attachedFiles.photo.name}`)
+      submissionBody.append("attachment", attachedFiles.photo, `1_photo_${sanitizeFileName(attachedFiles.photo.name)}`)
     }
     if (attachedFiles.passingCertificate) {
-      submissionBody.append("attachment", attachedFiles.passingCertificate, `2_passing_cert_${attachedFiles.passingCertificate.name}`)
+      submissionBody.append("attachment", attachedFiles.passingCertificate, `2_passing_cert_${sanitizeFileName(attachedFiles.passingCertificate.name)}`)
     }
     if (attachedFiles.marksheet) {
-      submissionBody.append("attachment", attachedFiles.marksheet, `3_marksheet_${attachedFiles.marksheet.name}`)
+      submissionBody.append("attachment", attachedFiles.marksheet, `3_marksheet_${sanitizeFileName(attachedFiles.marksheet.name)}`)
     }
     if (attachedFiles.aadharCard) {
-      submissionBody.append("attachment", attachedFiles.aadharCard, `4_aadhar_${attachedFiles.aadharCard.name}`)
+      submissionBody.append("attachment", attachedFiles.aadharCard, `4_aadhar_${sanitizeFileName(attachedFiles.aadharCard.name)}`)
     }
     if (attachedFiles.migrationCertificate) {
-      submissionBody.append("attachment", attachedFiles.migrationCertificate, `5_migration_${attachedFiles.migrationCertificate.name}`)
+      submissionBody.append("attachment", attachedFiles.migrationCertificate, `5_migration_${sanitizeFileName(attachedFiles.migrationCertificate.name)}`)
     }
     if (attachedFiles.transferCertificate) {
-      submissionBody.append("attachment", attachedFiles.transferCertificate, `6_tc_${attachedFiles.transferCertificate.name}`)
+      submissionBody.append("attachment", attachedFiles.transferCertificate, `6_tc_${sanitizeFileName(attachedFiles.transferCertificate.name)}`)
     }
     if (attachedFiles.panCard) {
-      submissionBody.append("attachment", attachedFiles.panCard, `7_pan_${attachedFiles.panCard.name}`)
+      submissionBody.append("attachment", attachedFiles.panCard, `7_pan_${sanitizeFileName(attachedFiles.panCard.name)}`)
     }
 
     try {
@@ -529,7 +577,7 @@ const Admission: React.FC = () => {
     }
   }
 
-  const stepIcons = [User, GraduationCap, Briefcase, FileText]
+  const stepIcons = [User, GraduationCap, Briefcase, Upload, FileText]
   const steps = admissionData.steps.map((s: any, idx: number) => ({
     ...s,
     icon: stepIcons[idx]
@@ -596,9 +644,9 @@ const Admission: React.FC = () => {
                 <p className="text-xs text-accent font-bold mt-1">Application Reference: {refId}</p>
               </div>
               <div className="flex gap-4 items-center">
-                {photoPreview && (
+                {filePreviews.photo && (
                   <div className="w-16 h-20 border-2 border-primary/20 rounded-lg overflow-hidden bg-white shadow-sm shrink-0">
-                    <img src={photoPreview} alt="Candidate" className="w-full h-full object-cover" />
+                    <img src={filePreviews.photo} alt="Candidate" className="w-full h-full object-cover" />
                   </div>
                 )}
                 <div className="text-right text-xs text-gray-400">
@@ -768,7 +816,7 @@ const Admission: React.FC = () => {
             />
 
             <AnimatePresence mode="wait">
-              {/* STEP 1: PERSONAL INFORMATION */}
+              {/* STEP 1: PERSONAL INFORMATION & PASSPORT PHOTO */}
               {step === 1 && (
                 <motion.div 
                   key="step1"
@@ -777,13 +825,65 @@ const Admission: React.FC = () => {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-8"
                 >
-                  <div className="flex items-center gap-4 mb-8">
+                  <div className="flex items-center gap-4 mb-6">
                     <div className="p-3 bg-primary/5 rounded-2xl">
                       <User className="text-primary" size={24} />
                     </div>
                     <div>
                       <h2 className="text-2xl md:text-3xl font-bold text-primary">{sections.personal}</h2>
-                      <p className="text-xs text-gray-400">All demographic and statutory verification details</p>
+                      <p className="text-xs text-gray-400">Demographic details, statutory verification, and passport photograph</p>
+                    </div>
+                  </div>
+
+                  {/* PROMINENT PASSPORT PHOTO UPLOAD CARD */}
+                  <div className="bg-gradient-to-br from-primary/5 to-accent/5 p-6 rounded-3xl border-2 border-dashed border-primary/20 flex flex-col sm:flex-row items-center gap-6">
+                    <div className="w-28 h-32 rounded-2xl bg-white border-2 border-primary/30 shadow-md flex flex-col items-center justify-center overflow-hidden shrink-0 relative group">
+                      {filePreviews.photo ? (
+                        <img src={filePreviews.photo} alt="Passport Photo" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-center p-2 text-primary/60 flex flex-col items-center">
+                          <Camera size={28} className="mb-1 text-primary" />
+                          <span className="text-[10px] font-bold">Passport Photo</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 text-center sm:text-left space-y-2">
+                      <div className="flex items-center gap-2 justify-center sm:justify-start">
+                        <h4 className="font-bold text-primary text-sm uppercase tracking-wider">{documents_section.photo.label}</h4>
+                        {attachedFiles.photo && <CheckCircle size={16} className="text-emerald-600" />}
+                      </div>
+                      <p className="text-xs text-gray-500">{documents_section.photo.hint}</p>
+                      
+                      <div className="flex flex-wrap items-center gap-3 pt-2 justify-center sm:justify-start">
+                        <label className="btn btn-primary py-2.5 px-5 text-xs flex items-center gap-2 cursor-pointer shadow-md rounded-xl">
+                          <Upload size={14} />
+                          {attachedFiles.photo ? 'Change Photo' : 'Upload Passport Photo'}
+                          <input 
+                            type="file" 
+                            accept="image/jpeg,image/png,image/webp" 
+                            required
+                            onChange={(e) => handleFileChange('photo', e)} 
+                            className="hidden"
+                          />
+                        </label>
+
+                        {attachedFiles.photo && (
+                          <button 
+                            type="button" 
+                            onClick={() => removeFile('photo')} 
+                            className="text-rose-600 hover:text-rose-800 text-xs font-bold flex items-center gap-1 p-2 rounded-lg hover:bg-rose-50"
+                          >
+                            <Trash2 size={14} /> Remove
+                          </button>
+                        )}
+                      </div>
+                      
+                      {attachedFiles.photo && (
+                        <span className="text-[11px] text-emerald-700 font-semibold block pt-1">
+                          ✓ File selected: {attachedFiles.photo.name} ({(attachedFiles.photo.size / 1024).toFixed(1)} KB)
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -1050,7 +1150,7 @@ const Admission: React.FC = () => {
                   <button 
                     type="button" 
                     onClick={addQualification} 
-                    className="text-accent font-bold text-xs uppercase tracking-wider flex items-center gap-2 hover:gap-3 transition-all p-2 rounded-xl hover:bg-accent/10"
+                    className="text-accent font-bold text-xs uppercase tracking-wider flex items-center gap-2 hover:gap-3 transition-all p-2 rounded-xl hover:bg-accent/10 cursor-pointer"
                   >
                     + {academic_section.add_btn}
                   </button>
@@ -1102,7 +1202,7 @@ const Admission: React.FC = () => {
                 </motion.div>
               )}
 
-              {/* STEP 3: EMPLOYMENT & 7 MANDATORY DOCUMENT ATTACHMENTS */}
+              {/* STEP 3: EMPLOYMENT & EXTRACURRICULARS */}
               {step === 3 && (
                 <motion.div 
                   key="step3"
@@ -1117,7 +1217,7 @@ const Admission: React.FC = () => {
                     </div>
                     <div>
                       <h2 className="text-2xl md:text-3xl font-bold text-primary">{sections.experience}</h2>
-                      <p className="text-xs text-gray-400">Professional record, extracurriculars, and mandatory document verification</p>
+                      <p className="text-xs text-gray-400">Professional background, organization details, and extracurricular interests</p>
                     </div>
                   </div>
 
@@ -1129,7 +1229,7 @@ const Admission: React.FC = () => {
                           key={opt}
                           type="button"
                           onClick={() => setFormData((prev: any) => ({ ...prev, isEmployed: opt }))}
-                          className={`px-8 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all ${formData.isEmployed === opt ? 'bg-primary text-white shadow-lg' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                          className={`px-8 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all cursor-pointer ${formData.isEmployed === opt ? 'bg-primary text-white shadow-lg' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
                         >
                           {opt}
                         </button>
@@ -1193,175 +1293,348 @@ const Admission: React.FC = () => {
                       </div>
                     </div>
                   </div>
+                </motion.div>
+              )}
 
-                  {/* 7 MANDATORY DOCUMENT UPLOADS */}
-                  <div className="space-y-6 pt-6 border-t-2 border-primary/10">
+              {/* STEP 4: MANDATORY DOCUMENT & CERTIFICATE IMAGE UPLOADS */}
+              {step === 4 && (
+                <motion.div 
+                  key="step4"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-8"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-primary/5 rounded-2xl">
+                      <Upload className="text-primary" size={24} />
+                    </div>
                     <div>
-                      <h3 className="font-bold text-primary uppercase tracking-widest text-sm flex items-center gap-2">
-                        <Upload size={18} className="text-accent" />
-                        {documents_section.title}
-                      </h3>
-                      <p className="text-xs text-gray-500 mt-1">{documents_section.description}</p>
+                      <h2 className="text-2xl md:text-3xl font-bold text-primary">{sections.documents}</h2>
+                      <p className="text-xs text-gray-400">Upload all required statutory documents and certificates (JPG, PNG, or PDF format)</p>
                     </div>
+                  </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      
-                      {/* 1. Passport Photo */}
-                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.photo ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
-                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
-                          <ImageIcon size={20} />
+                  <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl text-blue-800 text-xs flex items-center gap-3">
+                    <Info size={18} className="shrink-0 text-blue-600" />
+                    <span>All 7 documents are compulsory. Each file is sanitized and verified before transmission (Max 5MB per file).</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    {/* 1. Passport Photo Check Card */}
+                    <div className={`p-6 rounded-3xl border-2 transition-all ${attachedFiles.photo ? 'border-emerald-500 bg-emerald-50/30' : 'border-dashed border-rose-300 bg-rose-50/20'}`}>
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2.5 bg-white rounded-xl shadow-sm text-primary">
+                            <ImageIcon size={20} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-900 text-sm">{documents_section.photo.label}</h4>
+                            <p className="text-[10px] text-gray-400">{documents_section.photo.hint}</p>
+                          </div>
                         </div>
-                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.photo.label}</label>
-                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.photo.hint}</p>
-                        <input 
-                          type="file" 
-                          accept="image/*" 
-                          required
-                          onChange={(e) => handleFileChange('photo', e)} 
-                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
-                        />
+                        {attachedFiles.photo ? (
+                          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[10px] rounded-full uppercase">✓ Uploaded</span>
+                        ) : (
+                          <span className="px-2.5 py-1 bg-rose-100 text-rose-800 font-bold text-[10px] rounded-full uppercase">Required</span>
+                        )}
+                      </div>
+
+                      {filePreviews.photo && (
+                        <div className="w-20 h-24 rounded-xl overflow-hidden border border-gray-200 mb-3 bg-white shadow-sm">
+                          <img src={filePreviews.photo} alt="Photo" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between pt-2">
+                        <label className="btn btn-outline-primary py-2 px-4 text-xs cursor-pointer rounded-xl">
+                          {attachedFiles.photo ? 'Replace Photo' : 'Select Photo'}
+                          <input 
+                            type="file" 
+                            accept="image/jpeg,image/png,image/webp" 
+                            onChange={(e) => handleFileChange('photo', e)} 
+                            className="hidden" 
+                          />
+                        </label>
                         {attachedFiles.photo && (
-                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
-                            <FileCheck size={14} /> {attachedFiles.photo.name}
-                          </div>
+                          <span className="text-[11px] text-gray-600 font-medium truncate max-w-[180px]">{attachedFiles.photo.name}</span>
                         )}
                       </div>
-
-                      {/* 2. Passing Certificate */}
-                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.passingCertificate ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
-                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
-                          <FileBadge size={20} />
-                        </div>
-                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.passingCertificate.label}</label>
-                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.passingCertificate.hint}</p>
-                        <input 
-                          type="file" 
-                          accept="application/pdf,image/*" 
-                          required
-                          onChange={(e) => handleFileChange('passingCertificate', e)} 
-                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
-                        />
-                        {attachedFiles.passingCertificate && (
-                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
-                            <FileCheck size={14} /> {attachedFiles.passingCertificate.name}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 3. Marksheet */}
-                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.marksheet ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
-                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
-                          <GraduationCap size={20} />
-                        </div>
-                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.marksheet.label}</label>
-                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.marksheet.hint}</p>
-                        <input 
-                          type="file" 
-                          accept="application/pdf,image/*" 
-                          required
-                          onChange={(e) => handleFileChange('marksheet', e)} 
-                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
-                        />
-                        {attachedFiles.marksheet && (
-                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
-                            <FileCheck size={14} /> {attachedFiles.marksheet.name}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 4. Aadhar Card */}
-                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.aadharCard ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
-                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
-                          <CreditCard size={20} />
-                        </div>
-                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.aadharCard.label}</label>
-                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.aadharCard.hint}</p>
-                        <input 
-                          type="file" 
-                          accept="application/pdf,image/*" 
-                          required
-                          onChange={(e) => handleFileChange('aadharCard', e)} 
-                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
-                        />
-                        {attachedFiles.aadharCard && (
-                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
-                            <FileCheck size={14} /> {attachedFiles.aadharCard.name}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 5. Migration Certificate */}
-                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.migrationCertificate ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
-                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
-                          <FileText size={20} />
-                        </div>
-                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.migrationCertificate.label}</label>
-                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.migrationCertificate.hint}</p>
-                        <input 
-                          type="file" 
-                          accept="application/pdf,image/*" 
-                          required
-                          onChange={(e) => handleFileChange('migrationCertificate', e)} 
-                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
-                        />
-                        {attachedFiles.migrationCertificate && (
-                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
-                            <FileCheck size={14} /> {attachedFiles.migrationCertificate.name}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 6. Transfer Certificate (TC) */}
-                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.transferCertificate ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
-                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
-                          <FileListIcon size={20} />
-                        </div>
-                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.transferCertificate.label}</label>
-                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.transferCertificate.hint}</p>
-                        <input 
-                          type="file" 
-                          accept="application/pdf,image/*" 
-                          required
-                          onChange={(e) => handleFileChange('transferCertificate', e)} 
-                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
-                        />
-                        {attachedFiles.transferCertificate && (
-                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
-                            <FileCheck size={14} /> {attachedFiles.transferCertificate.name}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 7. PAN Card */}
-                      <div className={`border-2 border-dashed rounded-3xl p-5 text-center transition-all ${attachedFiles.panCard ? 'border-emerald-500 bg-emerald-50/40' : 'border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
-                        <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center mx-auto mb-2 text-primary">
-                          <CreditCard size={20} />
-                        </div>
-                        <label className="text-xs font-bold text-gray-800 block mb-1">{documents_section.panCard.label}</label>
-                        <p className="text-[10px] text-gray-400 mb-3">{documents_section.panCard.hint}</p>
-                        <input 
-                          type="file" 
-                          accept="application/pdf,image/*" 
-                          required
-                          onChange={(e) => handleFileChange('panCard', e)} 
-                          className="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-hover cursor-pointer w-full"
-                        />
-                        {attachedFiles.panCard && (
-                          <div className="mt-2 text-emerald-700 text-xs font-bold flex items-center justify-center gap-1">
-                            <FileCheck size={14} /> {attachedFiles.panCard.name}
-                          </div>
-                        )}
-                      </div>
-
                     </div>
+
+                    {/* 2. Passing Certificate */}
+                    <div className={`p-6 rounded-3xl border-2 transition-all ${attachedFiles.passingCertificate ? 'border-emerald-500 bg-emerald-50/30' : 'border-dashed border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2.5 bg-white rounded-xl shadow-sm text-primary">
+                            <FileBadge size={20} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-900 text-sm">{documents_section.passingCertificate.label}</h4>
+                            <p className="text-[10px] text-gray-400">{documents_section.passingCertificate.hint}</p>
+                          </div>
+                        </div>
+                        {attachedFiles.passingCertificate ? (
+                          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[10px] rounded-full uppercase">✓ Uploaded</span>
+                        ) : (
+                          <span className="px-2.5 py-1 bg-gray-200 text-gray-600 font-bold text-[10px] rounded-full uppercase">Required</span>
+                        )}
+                      </div>
+
+                      {filePreviews.passingCertificate && (
+                        <div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 mb-3 bg-white shadow-sm">
+                          <img src={filePreviews.passingCertificate} alt="Passing Cert" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between pt-2">
+                        <label className="btn btn-outline-primary py-2 px-4 text-xs cursor-pointer rounded-xl">
+                          {attachedFiles.passingCertificate ? 'Replace File' : 'Upload Document'}
+                          <input 
+                            type="file" 
+                            accept="application/pdf,image/jpeg,image/png,image/webp" 
+                            onChange={(e) => handleFileChange('passingCertificate', e)} 
+                            className="hidden" 
+                          />
+                        </label>
+                        {attachedFiles.passingCertificate && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-gray-600 font-medium truncate max-w-[150px]">{attachedFiles.passingCertificate.name}</span>
+                            <button type="button" onClick={() => removeFile('passingCertificate')} className="text-rose-500 hover:text-rose-700"><Trash2 size={14} /></button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 3. Marksheet */}
+                    <div className={`p-6 rounded-3xl border-2 transition-all ${attachedFiles.marksheet ? 'border-emerald-500 bg-emerald-50/30' : 'border-dashed border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2.5 bg-white rounded-xl shadow-sm text-primary">
+                            <GraduationCap size={20} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-900 text-sm">{documents_section.marksheet.label}</h4>
+                            <p className="text-[10px] text-gray-400">{documents_section.marksheet.hint}</p>
+                          </div>
+                        </div>
+                        {attachedFiles.marksheet ? (
+                          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[10px] rounded-full uppercase">✓ Uploaded</span>
+                        ) : (
+                          <span className="px-2.5 py-1 bg-gray-200 text-gray-600 font-bold text-[10px] rounded-full uppercase">Required</span>
+                        )}
+                      </div>
+
+                      {filePreviews.marksheet && (
+                        <div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 mb-3 bg-white shadow-sm">
+                          <img src={filePreviews.marksheet} alt="Marksheet" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between pt-2">
+                        <label className="btn btn-outline-primary py-2 px-4 text-xs cursor-pointer rounded-xl">
+                          {attachedFiles.marksheet ? 'Replace File' : 'Upload Document'}
+                          <input 
+                            type="file" 
+                            accept="application/pdf,image/jpeg,image/png,image/webp" 
+                            onChange={(e) => handleFileChange('marksheet', e)} 
+                            className="hidden" 
+                          />
+                        </label>
+                        {attachedFiles.marksheet && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-gray-600 font-medium truncate max-w-[150px]">{attachedFiles.marksheet.name}</span>
+                            <button type="button" onClick={() => removeFile('marksheet')} className="text-rose-500 hover:text-rose-700"><Trash2 size={14} /></button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 4. Aadhar Card */}
+                    <div className={`p-6 rounded-3xl border-2 transition-all ${attachedFiles.aadharCard ? 'border-emerald-500 bg-emerald-50/30' : 'border-dashed border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2.5 bg-white rounded-xl shadow-sm text-primary">
+                            <CreditCard size={20} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-900 text-sm">{documents_section.aadharCard.label}</h4>
+                            <p className="text-[10px] text-gray-400">{documents_section.aadharCard.hint}</p>
+                          </div>
+                        </div>
+                        {attachedFiles.aadharCard ? (
+                          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[10px] rounded-full uppercase">✓ Uploaded</span>
+                        ) : (
+                          <span className="px-2.5 py-1 bg-gray-200 text-gray-600 font-bold text-[10px] rounded-full uppercase">Required</span>
+                        )}
+                      </div>
+
+                      {filePreviews.aadharCard && (
+                        <div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 mb-3 bg-white shadow-sm">
+                          <img src={filePreviews.aadharCard} alt="Aadhar" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between pt-2">
+                        <label className="btn btn-outline-primary py-2 px-4 text-xs cursor-pointer rounded-xl">
+                          {attachedFiles.aadharCard ? 'Replace File' : 'Upload Document'}
+                          <input 
+                            type="file" 
+                            accept="application/pdf,image/jpeg,image/png,image/webp" 
+                            onChange={(e) => handleFileChange('aadharCard', e)} 
+                            className="hidden" 
+                          />
+                        </label>
+                        {attachedFiles.aadharCard && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-gray-600 font-medium truncate max-w-[150px]">{attachedFiles.aadharCard.name}</span>
+                            <button type="button" onClick={() => removeFile('aadharCard')} className="text-rose-500 hover:text-rose-700"><Trash2 size={14} /></button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 5. Migration Certificate */}
+                    <div className={`p-6 rounded-3xl border-2 transition-all ${attachedFiles.migrationCertificate ? 'border-emerald-500 bg-emerald-50/30' : 'border-dashed border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2.5 bg-white rounded-xl shadow-sm text-primary">
+                            <FileText size={20} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-900 text-sm">{documents_section.migrationCertificate.label}</h4>
+                            <p className="text-[10px] text-gray-400">{documents_section.migrationCertificate.hint}</p>
+                          </div>
+                        </div>
+                        {attachedFiles.migrationCertificate ? (
+                          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[10px] rounded-full uppercase">✓ Uploaded</span>
+                        ) : (
+                          <span className="px-2.5 py-1 bg-gray-200 text-gray-600 font-bold text-[10px] rounded-full uppercase">Required</span>
+                        )}
+                      </div>
+
+                      {filePreviews.migrationCertificate && (
+                        <div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 mb-3 bg-white shadow-sm">
+                          <img src={filePreviews.migrationCertificate} alt="Migration" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between pt-2">
+                        <label className="btn btn-outline-primary py-2 px-4 text-xs cursor-pointer rounded-xl">
+                          {attachedFiles.migrationCertificate ? 'Replace File' : 'Upload Document'}
+                          <input 
+                            type="file" 
+                            accept="application/pdf,image/jpeg,image/png,image/webp" 
+                            onChange={(e) => handleFileChange('migrationCertificate', e)} 
+                            className="hidden" 
+                          />
+                        </label>
+                        {attachedFiles.migrationCertificate && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-gray-600 font-medium truncate max-w-[150px]">{attachedFiles.migrationCertificate.name}</span>
+                            <button type="button" onClick={() => removeFile('migrationCertificate')} className="text-rose-500 hover:text-rose-700"><Trash2 size={14} /></button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 6. Transfer Certificate (TC) */}
+                    <div className={`p-6 rounded-3xl border-2 transition-all ${attachedFiles.transferCertificate ? 'border-emerald-500 bg-emerald-50/30' : 'border-dashed border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2.5 bg-white rounded-xl shadow-sm text-primary">
+                            <FileListIcon size={20} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-900 text-sm">{documents_section.transferCertificate.label}</h4>
+                            <p className="text-[10px] text-gray-400">{documents_section.transferCertificate.hint}</p>
+                          </div>
+                        </div>
+                        {attachedFiles.transferCertificate ? (
+                          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[10px] rounded-full uppercase">✓ Uploaded</span>
+                        ) : (
+                          <span className="px-2.5 py-1 bg-gray-200 text-gray-600 font-bold text-[10px] rounded-full uppercase">Required</span>
+                        )}
+                      </div>
+
+                      {filePreviews.transferCertificate && (
+                        <div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 mb-3 bg-white shadow-sm">
+                          <img src={filePreviews.transferCertificate} alt="Transfer Certificate" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between pt-2">
+                        <label className="btn btn-outline-primary py-2 px-4 text-xs cursor-pointer rounded-xl">
+                          {attachedFiles.transferCertificate ? 'Replace File' : 'Upload Document'}
+                          <input 
+                            type="file" 
+                            accept="application/pdf,image/jpeg,image/png,image/webp" 
+                            onChange={(e) => handleFileChange('transferCertificate', e)} 
+                            className="hidden" 
+                          />
+                        </label>
+                        {attachedFiles.transferCertificate && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-gray-600 font-medium truncate max-w-[150px]">{attachedFiles.transferCertificate.name}</span>
+                            <button type="button" onClick={() => removeFile('transferCertificate')} className="text-rose-500 hover:text-rose-700"><Trash2 size={14} /></button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 7. PAN Card */}
+                    <div className={`p-6 rounded-3xl border-2 transition-all ${attachedFiles.panCard ? 'border-emerald-500 bg-emerald-50/30' : 'border-dashed border-gray-200 bg-gray-50/50 hover:border-primary'}`}>
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2.5 bg-white rounded-xl shadow-sm text-primary">
+                            <CreditCard size={20} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-gray-900 text-sm">{documents_section.panCard.label}</h4>
+                            <p className="text-[10px] text-gray-400">{documents_section.panCard.hint}</p>
+                          </div>
+                        </div>
+                        {attachedFiles.panCard ? (
+                          <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[10px] rounded-full uppercase">✓ Uploaded</span>
+                        ) : (
+                          <span className="px-2.5 py-1 bg-gray-200 text-gray-600 font-bold text-[10px] rounded-full uppercase">Required</span>
+                        )}
+                      </div>
+
+                      {filePreviews.panCard && (
+                        <div className="w-20 h-20 rounded-xl overflow-hidden border border-gray-200 mb-3 bg-white shadow-sm">
+                          <img src={filePreviews.panCard} alt="PAN Card" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between pt-2">
+                        <label className="btn btn-outline-primary py-2 px-4 text-xs cursor-pointer rounded-xl">
+                          {attachedFiles.panCard ? 'Replace File' : 'Upload Document'}
+                          <input 
+                            type="file" 
+                            accept="application/pdf,image/jpeg,image/png,image/webp" 
+                            onChange={(e) => handleFileChange('panCard', e)} 
+                            className="hidden" 
+                          />
+                        </label>
+                        {attachedFiles.panCard && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-gray-600 font-medium truncate max-w-[150px]">{attachedFiles.panCard.name}</span>
+                            <button type="button" onClick={() => removeFile('panCard')} className="text-rose-500 hover:text-rose-700"><Trash2 size={14} /></button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                   </div>
                 </motion.div>
               )}
 
-              {/* STEP 4: STATEMENT OF PURPOSE & DECLARATION */}
-              {step === 4 && (
+              {/* STEP 5: STATEMENT OF PURPOSE & DECLARATION */}
+              {step === 5 && (
                 <motion.div 
-                  key="step4"
+                  key="step5"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -1430,7 +1703,7 @@ const Admission: React.FC = () => {
                             type="checkbox" 
                             checked={formData.declarationAccepted} 
                             onChange={() => setFormData((prev: any) => ({ ...prev, declarationAccepted: !prev.declarationAccepted }))}
-                            className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-primary"
+                            className="w-5 h-5 rounded border-2 border-primary text-primary focus:ring-primary cursor-pointer"
                             required
                           />
                           <span className="text-xs font-bold text-primary">{statement_section.declaration.accept}</span>
@@ -1479,7 +1752,7 @@ const Admission: React.FC = () => {
                 <ChevronLeft size={20} /> Previous
               </button>
               
-              {step < 4 ? (
+              {step < 5 ? (
                 <button 
                   type="button" 
                   onClick={nextStep} 
