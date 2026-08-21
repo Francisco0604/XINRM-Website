@@ -431,16 +431,25 @@ const Admission: React.FC = () => {
     }
 
     try {
-      // 1. Dispatch to Web3Forms direct email delivery
+      // 1. Dispatch to FormSubmit direct email delivery
+      const formSubmitPromise = fetch("https://formsubmit.co/ajax/xinrmsocialcentre50@gmail.com", {
+        method: "POST",
+        body: submissionBody
+      }).catch(err => {
+        console.warn('FormSubmit dispatch note:', err)
+        return null
+      })
+
+      // 2. Dispatch to Web3Forms direct email delivery
       const emailPromise = fetch("https://api.web3forms.com/submit", {
         method: "POST",
         body: submissionBody
       }).catch(err => {
-        console.warn('Direct email dispatch note:', err)
+        console.warn('Web3Forms dispatch note:', err)
         return null
       })
 
-      // 2. Dispatch to Netlify Serverless Function
+      // 3. Dispatch to Netlify Serverless Function
       const functionPromise = fetch("/.netlify/functions/submit-admission", {
         method: "POST",
         body: submissionBody
@@ -449,7 +458,7 @@ const Admission: React.FC = () => {
         return null
       })
 
-      // 3. Dispatch to Netlify Form detection endpoint
+      // 4. Dispatch to Netlify Form detection endpoint
       const netlifyPromise = fetch("/", {
         method: "POST",
         body: submissionBody
@@ -458,7 +467,7 @@ const Admission: React.FC = () => {
         return null
       })
 
-      await Promise.allSettled([emailPromise, functionPromise, netlifyPromise])
+      await Promise.allSettled([formSubmitPromise, emailPromise, functionPromise, netlifyPromise])
 
       setIsSubmitted(true)
       window.scrollTo(0, 0)
