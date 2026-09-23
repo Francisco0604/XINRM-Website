@@ -187,35 +187,31 @@
     }
   },
   "documents_section": {
-    "title": "Mandatory Document & Image Uploads",
-    "description": "Please upload clear, legible digital copies (JPG, PNG, or PDF format, max 5MB each). All 7 documents are compulsory for admission processing.",
+    "title": "Document & Certificate Uploads",
+    "description": "Please upload clear digital copies in PDF format (max 5MB each). Passport photo must be in JPG/PNG format.",
     "photo": {
       "label": "1. Passport Size Photograph *",
       "hint": "Recent color passport photo (JPG/PNG format, max 5MB)"
     },
-    "passingCertificate": {
-      "label": "2. Passing Certificate *",
-      "hint": "Graduation / Qualifying Degree Passing Certificate (PDF/JPG/PNG)"
+    "aadharCard": {
+      "label": "2. Aadhar Card *",
+      "hint": "Self-attested Aadhaar Card (PDF format, max 5MB)"
     },
     "marksheet": {
       "label": "3. Marksheet *",
-      "hint": "Final Year / Consolidated Graduation Marksheet (PDF/JPG/PNG)"
+      "hint": "Final Year / Consolidated Graduation Marksheet (PDF format, max 5MB)"
     },
-    "aadharCard": {
-      "label": "4. Aadhar Card *",
-      "hint": "Self-attested copy of Aadhaar Card (PDF/JPG/PNG)"
+    "passingCertificate": {
+      "label": "4. Passing Certificate *",
+      "hint": "Graduation / Qualifying Degree Passing Certificate (PDF format, max 5MB)"
     },
-    "migrationCertificate": {
-      "label": "5. Migration Certificate *",
-      "hint": "Official University Migration Certificate (PDF/JPG/PNG)"
+    "leavingCertificate": {
+      "label": "5. Leaving Certificate *",
+      "hint": "College / Institute Leaving Certificate (LC) (PDF format, max 5MB)"
     },
     "transferCertificate": {
-      "label": "6. Transfer Certificate (TC) *",
-      "hint": "College Leaving / Transfer Certificate (PDF/JPG/PNG)"
-    },
-    "panCard": {
-      "label": "7. PAN Card *",
-      "hint": "Self-attested copy of PAN Card (PDF/JPG/PNG)"
+      "label": "6. Transfer Certificate (TC)",
+      "hint": "College Transfer Certificate if applicable (Optional, PDF format, max 5MB)"
     }
   },
   "statement_section": {

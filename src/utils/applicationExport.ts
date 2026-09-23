@@ -181,21 +181,20 @@ export function generateApplicationExcel(formData: any, refNumber: string): void
     wsExp['!cols'] = [{ wch: 35 }, { wch: 50 }]
     XLSX.utils.book_append_sheet(wb, wsExp, "3. Experience & Languages")
 
-    // Sheet 4: Mandatory Document Upload Verification
+    // Sheet 4: Admission Document Upload Verification
     const docRows = [
-      ["MANDATORY ADMISSION DOCUMENTS CHECKLIST"],
+      ["ADMISSION DOCUMENTS CHECKLIST"],
       [],
-      ["#", "REQUIRED DOCUMENT", "ATTACHMENT STATUS", "FILE NAME"],
-      ["1", "Passport Size Photograph", formData.attachedPhotoName ? "ATTACHED" : "PENDING", formData.attachedPhotoName || "Not uploaded"],
-      ["2", "Passing Certificate", formData.attachedPassingCertName ? "ATTACHED" : "PENDING", formData.attachedPassingCertName || "Not uploaded"],
-      ["3", "Marksheet", formData.attachedMarksheetName ? "ATTACHED" : "PENDING", formData.attachedMarksheetName || "Not uploaded"],
-      ["4", "Aadhar Card (Self-Attested)", formData.attachedAadharDocName ? "ATTACHED" : "PENDING", formData.attachedAadharDocName || "Not uploaded"],
-      ["5", "Migration Certificate", formData.attachedMigrationName ? "ATTACHED" : "PENDING", formData.attachedMigrationName || "Not uploaded"],
-      ["6", "Transfer Certificate (TC)", formData.attachedTransferCertName ? "ATTACHED" : "PENDING", formData.attachedTransferCertName || "Not uploaded"],
-      ["7", "PAN Card", formData.attachedPanDocName ? "ATTACHED" : "PENDING", formData.attachedPanDocName || "Not uploaded"]
+      ["#", "REQUIRED DOCUMENT", "FORMAT / REQUIREMENT", "ATTACHMENT STATUS", "FILE NAME"],
+      ["1", "Passport Size Photograph", "JPG / PNG (Mandatory)", formData.attachedPhotoName ? "ATTACHED" : "PENDING", formData.attachedPhotoName || "Not uploaded"],
+      ["2", "Aadhar Card", "PDF (Mandatory)", formData.attachedAadharDocName ? "ATTACHED" : "PENDING", formData.attachedAadharDocName || "Not uploaded"],
+      ["3", "Marksheet", "PDF (Mandatory)", formData.attachedMarksheetName ? "ATTACHED" : "PENDING", formData.attachedMarksheetName || "Not uploaded"],
+      ["4", "Passing Certificate", "PDF (Mandatory)", formData.attachedPassingCertName ? "ATTACHED" : "PENDING", formData.attachedPassingCertName || "Not uploaded"],
+      ["5", "Leaving Certificate", "PDF (Mandatory)", formData.attachedLeavingCertName ? "ATTACHED" : "PENDING", formData.attachedLeavingCertName || "Not uploaded"],
+      ["6", "Transfer Certificate (TC)", "PDF (If Applicable)", formData.attachedTransferCertName ? "ATTACHED" : "N/A", formData.attachedTransferCertName || "Not attached (N/A)"]
     ]
     const wsDocs = XLSX.utils.aoa_to_sheet(docRows)
-    wsDocs['!cols'] = [{ wch: 5 }, { wch: 35 }, { wch: 22 }, { wch: 45 }]
+    wsDocs['!cols'] = [{ wch: 5 }, { wch: 30 }, { wch: 25 }, { wch: 20 }, { wch: 45 }]
     XLSX.utils.book_append_sheet(wb, wsDocs, "4. Documents Checklist")
 
     // Sheet 5: Statements & Statutory Declaration
